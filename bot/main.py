@@ -1,16 +1,52 @@
-# This is a sample Python script.
+import discord
+from discord.ext import commands
+from psycopg2 import pool
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f"Hi, {name}")  # Press Ctrl+F8 to toggle the breakpoint.
+import settings
 
 
-# Press the green button in the gutter to run the script.
+def run():
+    intents = discord.Intents.default()
+    intents.message_content = True
+    intents.members = True
+    intents.presences = True
+
+    bot = commands.Bot(command_prefix="!", case_insensitive=True, intents=intents)
+
+    connection_pool = pool.SimpleConnectionPool(
+        1,  # Minimum number of connections in the pool
+        10,  # Maximum number of connections in the pool
+        settings.DATABASE_URL,
+    )
+
+    if connection_pool:
+        print("Connection pool created successfully.")
+
+    bot.db = connection_pool
+
+    conn = connection_pool.getconn()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM users")
+    users = cur.fetchall()
+
+    cur.close()
+    connection_pool.putconn(conn)
+
+    activity_sessions = {user[0]: {} for user in users}
+
+    bot.activity_sessions = activity_sessions
+
+    @bot.event
+    async def on_ready():
+        print(f"Bot is online. Logged in as {bot.user.name}.")
+
+        for cog_file in settings.COGS_DIR.glob("*.py"):
+            if cog_file.name != "__init.py":
+                await bot.load_extension(f"cogs.{cog_file.name[:-3]}")
+
+    bot.run(settings.BOT_TOKEN)
+
+
 if __name__ == "__main__":
-    print_hi("PyCharm")
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    run()
