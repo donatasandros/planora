@@ -4,6 +4,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from utils.time import format_time
+
 
 class Activity(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -22,16 +24,21 @@ class Activity(commands.Cog):
         conn = self.client.db.getconn()
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM activities WHERE user_id = %s", (str(member.id),))
+        cur.execute(
+            "SELECT * FROM activities WHERE user_id = %s ORDER BY total_time DESC",
+            (str(member.id),),
+        )
         user_data = cur.fetchall()
 
         cur.close()
         self.client.db.putconn(conn)
 
+        total_time = format_time(sum(activity[5] for activity in user_data))
+
         all_activities = (
             "\n".join(
                 [
-                    f"`{activity[2]}` - {activity[5]}s - <t:{int(activity[4])}:R>"
+                    f"`{activity[2]}` - {format_time(activity[5])} - <t:{int(activity[4])}:R>"
                     for activity in user_data
                 ]
             )
@@ -51,7 +58,7 @@ class Activity(commands.Cog):
         embed = discord.Embed(
             colour=discord.Colour.purple(),
             title=f"{member.name}'s activity",
-            description=f"**Total time wasted -** TIME\n\n**Current activities:**\n{current_activities}\n\n**All activities:**\n{all_activities}",
+            description=f"**Total time tracked -** {total_time}\n\n**Current activities:**\n{current_activities}\n\n**All activities:**\n{all_activities}",
         )
 
         await interaction.followup.send(embed=embed)
