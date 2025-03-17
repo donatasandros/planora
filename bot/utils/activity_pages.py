@@ -30,7 +30,9 @@ async def create_activity_pages(bot: commands.Bot, user: discord.Member):
 
         # Configuration
         lines_per_page = 12
-        lines_for_current_activity = len(current_activities) + 1  # +1 for title
+        lines_for_current_activity = (
+            len(current_activities) + 3
+        )  # +3 (2 titles & 1 spacing line)
         lines_for_past_activity = lines_per_page - lines_for_current_activity
 
         # Create the first page with current and past activities
