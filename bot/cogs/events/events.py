@@ -34,7 +34,11 @@ class Events(commands.Cog):
             INSERT INTO activities (user_id, name, start_time, end_time, total_time)
             VALUES ($1, $2, $3, $4, $5)
             """,
-            (str(user_id), activity_name, start_time, end_time, time_played),
+            str(user_id),
+            activity_name,
+            start_time,
+            end_time,
+            time_played,
         )
 
     @commands.Cog.listener()
