@@ -9,10 +9,6 @@ class System(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"{__name__} is online!")
-
     @app_commands.command(
         name="ping", description="Check the bot's latency to the Discord server."
     )
@@ -37,7 +33,7 @@ class System(commands.Cog):
                     f"Successfully synced {len(synced_commands)} slash command(s)!"
                 )
             except Exception as e:
-                print("An error occurred while syncing the commands.", e)
+                print(f"[ERROR] An error occurred while syncing the commands: {e}")
         else:
             await interaction.followup.send(
                 "You do not have permission to sync the commands."

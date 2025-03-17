@@ -1,52 +1,54 @@
+import asyncio
+
 import discord
 from discord.ext import commands
-from psycopg2 import pool
 
 import settings
+from lib.db import Database
 
 
-def run():
+async def run():
+    db = await Database.connect()
+
+    users = await db.fetch("SELECT * FROM users")
+    activity_sessions = {user[0]: {} for user in users}
+
     intents = discord.Intents.default()
     intents.message_content = True
     intents.members = True
     intents.presences = True
 
-    bot = commands.Bot(command_prefix="!", case_insensitive=True, intents=intents)
-
-    connection_pool = pool.SimpleConnectionPool(
-        1,  # Minimum number of connections in the pool
-        10,  # Maximum number of connections in the pool
-        settings.DATABASE_URL,
+    bot = commands.Bot(
+        command_prefix="!",
+        case_insensitive=True,
+        activity=discord.Activity(
+            type=discord.ActivityType.listening,
+            name="the startup sequence",
+        ),
+        owner_id=settings.DEV_USER_ID,
+        reconnect=True,
+        intents=intents,
     )
 
-    if connection_pool:
-        print("Connection pool created successfully.")
-
-    bot.db = connection_pool
-
-    conn = connection_pool.getconn()
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM users")
-    users = cur.fetchall()
-
-    cur.close()
-    connection_pool.putconn(conn)
-
-    activity_sessions = {user[0]: {} for user in users}
-
+    bot.db = db
     bot.activity_sessions = activity_sessions
 
-    @bot.event
-    async def on_ready():
-        print(f"Bot is online. Logged in as {bot.user.name}.")
+    for extension in settings.EXTENSIONS:
+        try:
+            await bot.load_extension(extension)
+            print(f"[EXTENSION] {extension} was loaded successfully.")
+        except Exception as e:
+            print(f"[ERROR] Couldn't load extension {extension}: {e}")
 
-        for cog_file in settings.COGS_DIR.glob("*.py"):
-            if cog_file.name != "__init.py":
-                await bot.load_extension(f"cogs.{cog_file.name[:-3]}")
-
-    bot.run(settings.BOT_TOKEN)
+    try:
+        await bot.start(settings.BOT_TOKEN)
+        print("[BOT] Starting the bot.")
+    except KeyboardInterrupt as e:
+        print(f"[ERROR] An error occurred while booting up: {e}")
+        await db.close()
+        await bot.close()
 
 
 if __name__ == "__main__":
-    run()
+    loop = asyncio.get_event_loop_policy().get_event_loop()
+    loop.run_until_complete(run())
