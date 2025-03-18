@@ -20,6 +20,9 @@ async def create_activity_pages(bot: commands.Bot, user: discord.Member):
             str(user.id),
         )
 
+        # Calculate total time from all past activities
+        total_past_time = sum(activity[1] for activity in past_activities)
+
         # Get the user's current activities (if any)
         current_activities = [
             f"**•** `{activity}` - <t:{int(bot.activity_sessions.get(user.id)[activity]['time'])}:R>"
@@ -41,7 +44,7 @@ async def create_activity_pages(bot: commands.Bot, user: discord.Member):
             color=discord.Color.purple(),
         )
 
-        description = f"**Current activities:**\n{'\n'.join(current_activities)}\n\n**All activities:**\n"
+        description = f"**Total time tracked:** {format_time(total_past_time)}\n**Current activities:**\n{'\n'.join(current_activities)}\n\n**All activities:**\n"
 
         # Add past activities to the description, limited to the first page
         if past_activities:

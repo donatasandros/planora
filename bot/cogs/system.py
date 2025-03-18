@@ -38,6 +38,35 @@ class System(commands.Cog):
             )
         except Exception as e:
             print(f"[ERROR] An error occurred while syncing the commands: {e}")
+            await interaction.followup.send(
+                f"An error occurred while syncing the commands."
+            )
+
+    @app_commands.command(name="reload", description="Reload an extension")
+    async def reload(self, interaction: discord.Interaction, extension: str):
+        if interaction.user.id != int(settings.DEV_USER_ID):
+            await interaction.response.send_message(
+                "You cannot use this command.", ephemeral=True
+            )
+            return
+
+        await interaction.response.defer()
+
+        try:
+            await self.bot.reload_extension(extension)
+            await interaction.followup.send(f"Successfully reloaded {extension}!")
+        except Exception as e:
+            print(f"[ERROR] An error occurred while reloading the extension: {e}")
+            await interaction.followup.send(
+                f"An error occurred while reloading {extension}."
+            )
+
+    @reload.autocomplete("extension")
+    async def reload_autocomplete(self, interaction: discord.Interaction, current: str):
+        data = []
+        for extension in settings.EXTENSIONS:
+            data.append(app_commands.Choice(name=extension, value=extension))
+        return data
 
 
 async def setup(bot):
