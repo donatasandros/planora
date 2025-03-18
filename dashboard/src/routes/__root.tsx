@@ -11,6 +11,7 @@ import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
+import { getCurrentUser } from "~/utils/users";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -51,6 +52,11 @@ export const Route = createRootRoute({
       { rel: "icon", href: "/favicon.ico" },
     ],
   }),
+  beforeLoad: async () => {
+    const user = await getCurrentUser();
+
+    return { user };
+  },
   errorComponent: (props) => {
     return (
       <RootDocument>
