@@ -30,7 +30,6 @@ class Activity(commands.Cog):
             pages = await create_activity_pages(self.bot, user)
 
             pagination_view = PaginationView(pages)
-
             await pagination_view.send(interaction)
 
         except Exception as e:
