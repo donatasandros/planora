@@ -12,6 +12,17 @@ class PaginationView(discord.ui.View):
         self.message: discord.Message | None = None
         self.update_buttons()
 
+    async def interaction_check(self, interaction: discord.Interaction, /) -> bool:
+        if (
+            self.message
+            and interaction.user.id == self.message.interaction_metadata.user.id
+        ):
+            return True
+        await interaction.response.send_message(
+            "You cannot interact with this pagination.", ephemeral=True
+        )
+        return False
+
     async def send(self, interaction: discord.Interaction):
         await interaction.followup.send(embed=self.pages[self.current_page], view=self)
         self.message = await interaction.original_response()

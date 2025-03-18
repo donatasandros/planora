@@ -18,26 +18,26 @@ class System(commands.Cog):
 
     @app_commands.command(name="sync", description="Sync slash commands.")
     async def sync(self, interaction: discord.Interaction):
+        if interaction.user.id != int(settings.DEV_USER_ID):
+            await interaction.response.send_message(
+                "You cannot use this command.", ephemeral=True
+            )
+            return
 
         await interaction.response.defer()
 
-        if interaction.user.id == int(settings.DEV_USER_ID):
-            try:
-                self.bot.tree.copy_global_to(
-                    guild=discord.Object(id=int(settings.DEV_GUILD_ID))
-                )
-                synced_commands = await self.bot.tree.sync(
-                    guild=discord.Object(id=int(settings.DEV_GUILD_ID))
-                )
-                await interaction.followup.send(
-                    f"Successfully synced {len(synced_commands)} slash command(s)!"
-                )
-            except Exception as e:
-                print(f"[ERROR] An error occurred while syncing the commands: {e}")
-        else:
-            await interaction.followup.send(
-                "You do not have permission to sync the commands."
+        try:
+            self.bot.tree.copy_global_to(
+                guild=discord.Object(id=int(settings.DEV_GUILD_ID))
             )
+            synced_commands = await self.bot.tree.sync(
+                guild=discord.Object(id=int(settings.DEV_GUILD_ID))
+            )
+            await interaction.followup.send(
+                f"Successfully synced {len(synced_commands)} slash command(s)!"
+            )
+        except Exception as e:
+            print(f"[ERROR] An error occurred while syncing the commands: {e}")
 
 
 async def setup(bot):

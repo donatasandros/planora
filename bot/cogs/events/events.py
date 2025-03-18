@@ -10,6 +10,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        await self.bot.change_presence(status=discord.Status.online)
         print(f"Logged in as:\n{self.bot.user} ({self.bot.user.id})")
 
     async def update_activity(self, user_id, activity):

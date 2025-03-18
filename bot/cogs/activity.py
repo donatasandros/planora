@@ -24,9 +24,7 @@ class Activity(commands.Cog):
             user = interaction.guild.get_member(user.id)
 
             if user is None:
-                await interaction.followup.send(
-                    "Couldn't find the user in this guild.", ephemeral=True
-                )
+                await interaction.followup.send("Couldn't find the user in this guild.")
                 return
 
             pages = await create_activity_pages(self.bot, user)
@@ -38,8 +36,7 @@ class Activity(commands.Cog):
         except Exception as e:
             print(f"[ERROR] An error occurred while fetching user's activity: {e}")
             await interaction.followup.send(
-                "An error occurred while fetching the activity stats. Please try again later.",
-                ephemeral=True,
+                "An error occurred while fetching the activity stats. Please try again later."
             )
 
 
