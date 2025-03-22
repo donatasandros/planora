@@ -1,11 +1,15 @@
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { NuqsAdapter } from "nuqs/adapters/react";
 import * as React from "react";
+
+import type { QueryClient } from "@tanstack/react-query";
 
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
@@ -13,7 +17,9 @@ import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 import { getCurrentUser } from "~/utils/users";
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       {
@@ -82,9 +88,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
-        {children}
+      <body suppressHydrationWarning>
+        <NuqsAdapter>{children}</NuqsAdapter>
         <TanStackRouterDevtools position="bottom-right" />
+        <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
       </body>
     </html>
