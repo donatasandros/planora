@@ -355,14 +355,13 @@ function RouteComponent() {
             ))}
           </AccordionPrimitive.Root>
         </div>
-        <div className="mx-4 rounded-2xl bg-gray-50 px-5 py-8 text-center md:mx-8 md:px-8 md:pb-10 dark:bg-gray-900">
+        <div className="mx-0 rounded-2xl bg-gray-50 px-5 py-8 text-center md:mx-8 md:px-8 md:pb-10 dark:bg-gray-900">
           <div className="mb-6 flex items-center justify-center md:mb-8">
             <img
               src="https://cdn.discordapp.com/avatars/408587203703341058/a_c9424d260afbd5f79b38b01e7bf5f66d.png?size=1024"
               alt="User"
               className="-mr-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
             />
-
             <img
               src="https://cdn.discordapp.com/avatars/559303647864029184/c9b56adc3979392208537ef0e7da8084.png?size=1024"
               alt="User"
