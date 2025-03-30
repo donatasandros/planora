@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import * as React from "react";
 
 import { buttonVariants } from "~/components/ui/button";
+import { DARK_LOGO_URL, LIGHT_LOGO_URL } from "~/constants";
 import { cn } from "~/lib/utils";
 
 export function MainNav() {
@@ -39,13 +40,13 @@ export function MainNav() {
         <div className="flex items-center">
           <Link to="/">
             <img
-              src="https://cdn.zenpa.xyz/3Cg5.svg"
-              alt="Logo"
+              src={LIGHT_LOGO_URL}
+              alt="Planora logo"
               className="h-8 dark:hidden"
             />
             <img
-              src="https://cdn.zenpa.xyz/Cr3O.svg"
-              alt="Logo"
+              src={DARK_LOGO_URL}
+              alt="Planora logo"
               className="hidden h-8 dark:block"
             />
           </Link>

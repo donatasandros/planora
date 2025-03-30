@@ -1,8 +1,6 @@
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
-  ActivityIcon,
-  BarChart2Icon,
   BarChartIcon,
   CheckCircle2Icon,
   ClockIcon,
@@ -13,7 +11,16 @@ import {
 import { FaDiscord } from "react-icons/fa6";
 
 import { buttonVariants } from "~/components/ui/button";
-import { FAQS } from "~/features/marketing/constants";
+import {
+  COMMUNITY_LINK,
+  FAQS,
+  FAQ_AVATARS,
+  FEATURES,
+  HERO_IMAGE,
+  INVITE_LINK,
+  METRICS,
+} from "~/features/marketing/constants";
+import { cn } from "~/lib/utils";
 
 export const Route = createFileRoute("/_marketing/")({
   component: RouteComponent,
@@ -47,7 +54,7 @@ function RouteComponent() {
                 Learn more
               </a>
               <a
-                href="/"
+                href={INVITE_LINK}
                 className={buttonVariants({
                   variant: "primary",
                   size: "lg",
@@ -73,8 +80,9 @@ function RouteComponent() {
       </section>
       <section className="relative mx-auto -mt-24 max-w-[1280px] px-4 md:px-8">
         <img
-          src="https://placehold.co/960x540/png"
+          src={HERO_IMAGE}
           className="relative z-110 mx-auto aspect-video max-h-[540px] w-full max-w-[960px]"
+          alt="Planora dashboard mockup"
         />
         <div
           style={{
@@ -156,30 +164,16 @@ function RouteComponent() {
             </p>
           </div>
           <div className="flex flex-col items-center gap-8 px-6 pt-8 md:flex-row md:rounded-2xl md:bg-gray-50 md:p-16 md:dark:bg-gray-900">
-            <div className="flex-1 text-center">
-              <p className="text-brand-600 mb-3 text-5xl font-semibold md:text-6xl dark:text-gray-50">
-                100+
-              </p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Hours tracked
-              </p>
-            </div>
-            <div className="flex-1 text-center">
-              <p className="text-brand-600 mb-3 text-5xl font-semibold md:text-6xl dark:text-gray-50">
-                10,000+
-              </p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Sessions logged
-              </p>
-            </div>
-            <div className="flex-1 text-center">
-              <p className="text-brand-600 mb-3 text-5xl font-semibold md:text-6xl dark:text-gray-50">
-                50+
-              </p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Apps tracked
-              </p>
-            </div>
+            {METRICS.map((metric) => (
+              <div key={metric.id} className="flex-1 text-center">
+                <p className="text-brand-600 mb-3 text-5xl font-semibold md:text-6xl dark:text-gray-50">
+                  {metric.value}
+                </p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                  {metric.title}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -201,132 +195,48 @@ function RouteComponent() {
           </p>
         </div>
         <div className="space-y-12 md:space-y-24">
-          <div className="flex flex-col gap-x-24 gap-y-10 md:flex-row md:items-center">
-            <div className="flex-1">
-              <div className="mb-8">
-                <div className="mb-5 flex size-12 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs dark:border-gray-700 dark:bg-gray-950">
-                  <ActivityIcon className="size-6 text-gray-700 dark:text-gray-300" />
+          {FEATURES.map((feature, index) => (
+            <div
+              key={feature.id}
+              className={cn(
+                "flex flex-col gap-x-24 gap-y-10 md:items-center",
+                index % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row",
+              )}
+            >
+              <div className="flex-1">
+                <div className="mb-8">
+                  <div className="mb-5 flex size-12 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs dark:border-gray-700 dark:bg-gray-950">
+                    <feature.icon className="size-6 text-gray-700 dark:text-gray-300" />
+                  </div>
+                  <h3 className="mb-2 text-2xl font-semibold text-gray-900 md:mb-4 md:text-3xl dark:text-gray-50">
+                    {feature.title}
+                  </h3>
+                  <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="mb-2 text-2xl font-semibold text-gray-900 md:mb-4 md:text-3xl dark:text-gray-50">
-                  Track your activity
-                </h3>
-                <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                  Effortlessly track your activity across various apps using
-                  Discord Rich Presence. Simply add Planora to Discord and start
-                  gaining real-time insights into your activity patterns.
-                </p>
-              </div>
-              <div>
-                <ul className="space-y-4 pl-2 md:space-y-5 md:pl-4">
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Automatically track your activity
-                    </p>
-                  </li>
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      View detailed activity insights in real time
-                    </p>
-                  </li>
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Set it up once and track progress effortlessly
-                    </p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="flex-1">
-              <img src="https://placehold.co/560x512/png" className="w-full" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-x-24 gap-y-10 md:flex-row-reverse md:items-center">
-            <div className="flex-1">
-              <div className="mb-8">
-                <div className="mb-5 flex size-12 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs dark:border-gray-700 dark:bg-gray-950">
-                  <ClockIcon className="size-6 text-gray-700 dark:text-gray-300" />
+                <div>
+                  <ul className="space-y-4 pl-2 md:space-y-5 md:pl-4">
+                    {feature.children.map((child) => (
+                      <li key={child.id} className="flex items-center gap-x-3">
+                        <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
+                        <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
+                          {child.title}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="mb-2 text-2xl font-semibold text-gray-900 md:mb-4 md:text-3xl dark:text-gray-50">
-                  View playtime & sessions
-                </h3>
-                <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                  Monitor your gaming and app usage with detailed session
-                  tracking. Easily see total playtime and session duration for a
-                  complete view of your activities.
-                </p>
               </div>
-              <div>
-                <ul className="space-y-4 pl-2 md:space-y-5 md:pl-4">
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Track session playtime and app usage time
-                    </p>
-                  </li>
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Get insights into session durations and activity history
-                    </p>
-                  </li>
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      See your most active times and games
-                    </p>
-                  </li>
-                </ul>
+              <div className="flex-1">
+                <img
+                  src={feature.image}
+                  alt={`"${feature.title}" feature image`}
+                  className="w-full"
+                />
               </div>
             </div>
-            <div className="flex-1">
-              <img src="https://placehold.co/560x512/png" className="w-full" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-x-24 gap-y-10 md:flex-row md:items-center">
-            <div className="flex-1">
-              <div className="mb-8">
-                <div className="mb-5 flex size-12 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs dark:border-gray-700 dark:bg-gray-950">
-                  <BarChart2Icon className="size-6 text-gray-700 dark:text-gray-300" />
-                </div>
-                <h3 className="mb-2 text-2xl font-semibold text-gray-900 md:mb-4 md:text-3xl dark:text-gray-50">
-                  Analyze Usage Trends
-                </h3>
-                <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                  Understand your usage patterns with easy-to-read insights.
-                  Planora helps you identify trends to improve time management
-                  and boost productivity.
-                </p>
-              </div>
-              <div>
-                <ul className="space-y-4 pl-2 md:space-y-5 md:pl-4">
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Track daily, weekly, and monthly usage trends
-                    </p>
-                  </li>
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Visualize activity patterns for informed decisions
-                    </p>
-                  </li>
-                  <li className="flex items-center gap-x-3">
-                    <CheckCircle2Icon className="text-brand-600 dark:text-brand-500 size-7" />
-                    <p className="text-base text-gray-600 md:text-lg dark:text-gray-400">
-                      Get insights to improve productivity and focus
-                    </p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="flex-1">
-              <img src="https://placehold.co/560x512/png" className="w-full" />
-            </div>
-          </div>
+          ))}
         </div>
       </section>
       <section className="mx-auto max-w-[1280px] px-4 md:px-8">
@@ -343,7 +253,7 @@ function RouteComponent() {
             <AccordionPrimitive.Root
               type="single"
               collapsible={true}
-              className="*:mb-8 *:border-t *:border-gray-200 *:pt-6 *:first:border-none *:first:pt-0 *:last:mb-0 *:dark:border-gray-800"
+              className="*:mb-6 *:border-t *:border-gray-200 *:pt-6 *:first:border-none *:first:pt-0 *:last:mb-0 *:dark:border-gray-800"
             >
               {FAQS.map((faq) => (
                 <AccordionPrimitive.Item key={faq.id} value={faq.title}>
@@ -364,22 +274,15 @@ function RouteComponent() {
             </AccordionPrimitive.Root>
           </div>
           <div className="mx-0 rounded-2xl bg-gray-50 px-5 py-8 text-center md:mx-8 md:px-8 md:pb-10 dark:bg-gray-900">
-            <div className="mb-6 flex items-center justify-center md:mb-8">
-              <img
-                src="https://cdn.discordapp.com/avatars/408587203703341058/a_c9424d260afbd5f79b38b01e7bf5f66d.png?size=1024"
-                alt="User"
-                className="-mr-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
-              />
-              <img
-                src="https://cdn.discordapp.com/avatars/559303647864029184/c9b56adc3979392208537ef0e7da8084.png?size=1024"
-                alt="User"
-                className="z-10 size-14 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
-              />
-              <img
-                src="https://cdn.discordapp.com/avatars/687065657270862025/2c99c318f1bf46fda4afbd7ddd89f2cb.png?size=1024"
-                alt="User"
-                className="-ml-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
-              />
+            <div className="mb-6 flex items-center justify-center *:size-12 *:first:-mr-3 *:last:-ml-3 *:nth-[2]:z-10 *:nth-[2]:size-14 md:mb-8">
+              {FAQ_AVATARS.map((avatar) => (
+                <img
+                  key={avatar.id}
+                  src={avatar.image}
+                  alt="Support team member avatar"
+                  className="rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
+                />
+              ))}
             </div>
             <div>
               <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-50">
@@ -390,7 +293,7 @@ function RouteComponent() {
                 friendly team.
               </p>
               <a
-                href="/"
+                href={COMMUNITY_LINK}
                 className={buttonVariants({ variant: "primary", size: "lg" })}
               >
                 Get in touch
@@ -421,7 +324,7 @@ function RouteComponent() {
               Learn more
             </a>
             <a
-              href="/"
+              href={INVITE_LINK}
               className={buttonVariants({
                 variant: "primary",
                 size: "lg",
