@@ -1,12 +1,17 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import * as React from "react";
 
 import { buttonVariants } from "~/components/ui/button";
 import { DARK_LOGO_URL, LIGHT_LOGO_URL } from "~/constants";
+import { UserButton } from "~/features/auth/components/user-button";
 import { cn } from "~/lib/utils";
 
 export function MainNav() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+
+  const { user } = useRouteContext({
+    from: "/_marketing",
+  });
 
   React.useEffect(() => {
     function handleScroll() {
@@ -25,7 +30,7 @@ export function MainNav() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 z-200 w-full px-4 transition-all md:px-8",
+        "fixed top-0 left-0 z-10 w-full px-4 transition-all md:px-8",
         isScrolled ? "pt-3" : "py-4.5",
       )}
     >
@@ -33,7 +38,7 @@ export function MainNav() {
         className={cn(
           "mx-auto flex w-full max-w-[1280px] items-center justify-between border transition-all",
           isScrolled
-            ? "h-16 rounded-2xl border-gray-200 bg-white/70 py-3 pr-3 pl-4 shadow-xs backdrop-blur-3xl dark:border-gray-800 dark:bg-gray-950/80"
+            ? "h-16 rounded-2xl border-gray-200 bg-white py-3 pr-3 pl-4 shadow-xs dark:border-gray-800 dark:bg-gray-950"
             : "h-11 border-transparent",
         )}
       >
@@ -51,20 +56,24 @@ export function MainNav() {
             />
           </Link>
         </div>
-        <div className="flex items-center gap-x-3">
-          <Link
-            to="/auth/sign-in"
-            className={buttonVariants({ variant: "secondary", size: "md" })}
-          >
-            Log in
-          </Link>
-          <Link
-            to="/auth/sign-in"
-            className={buttonVariants({ variant: "primary", size: "md" })}
-          >
-            Sign up
-          </Link>
-        </div>
+        {user ? (
+          <UserButton />
+        ) : (
+          <div className="flex items-center gap-x-3">
+            <Link
+              to="/auth/sign-in"
+              className={buttonVariants({ variant: "secondary", size: "md" })}
+            >
+              Log in
+            </Link>
+            <Link
+              to="/auth/sign-in"
+              className={buttonVariants({ variant: "primary", size: "md" })}
+            >
+              Sign up
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );

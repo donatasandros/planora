@@ -13,9 +13,10 @@ import type { QueryClient } from "@tanstack/react-query";
 
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
+import { ThemeProvider } from "~/components/theme-provider";
+import { getCurrentUser } from "~/features/auth/functions/get-current-user";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
-import { getCurrentUser } from "~/utils/users";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -89,7 +90,16 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <NuqsAdapter>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </NuqsAdapter>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

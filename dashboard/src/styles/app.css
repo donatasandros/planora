@@ -7,6 +7,10 @@
 
 :root {
   font-family: Inter, sans-serif;
+
+  button {
+    @apply cursor-pointer;
+  }
 }
 
 @theme {

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_marketing/")({
 
 function RouteComponent() {
   return (
-    <div className="overflow-x-hidden">
+    <div className="isolate overflow-x-hidden">
       <section className="bg-brand-50 relative flex w-full px-4 pt-36 pb-16 md:px-8 md:pt-44 md:pb-24 dark:bg-gray-900">
         <div className="z-10 mx-auto max-w-[1280px]">
           <div>
@@ -81,7 +81,7 @@ function RouteComponent() {
       <section className="relative mx-auto -mt-24 max-w-[1280px] px-4 md:px-8">
         <img
           src={HERO_IMAGE}
-          className="relative z-110 mx-auto aspect-video max-h-[540px] w-full max-w-[960px]"
+          className="relative z-100 mx-auto aspect-video max-h-[540px] w-full max-w-[960px]"
           alt="Planora dashboard mockup"
         />
         <div

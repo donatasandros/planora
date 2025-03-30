@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as ProtectedImport } from './routes/_protected'
 import { Route as MarketingImport } from './routes/_marketing'
+import { Route as AuthImport } from './routes/_auth'
 import { Route as MarketingIndexImport } from './routes/_marketing/index'
 import { Route as AuthAuthSignInImport } from './routes/_auth/auth/sign-in'
 
@@ -28,6 +29,11 @@ const MarketingRoute = MarketingImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const MarketingIndexRoute = MarketingIndexImport.update({
   id: '/',
   path: '/',
@@ -35,15 +41,22 @@ const MarketingIndexRoute = MarketingIndexImport.update({
 } as any)
 
 const AuthAuthSignInRoute = AuthAuthSignInImport.update({
-  id: '/_auth/auth/sign-in',
+  id: '/auth/sign-in',
   path: '/auth/sign-in',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthImport
+      parentRoute: typeof rootRoute
+    }
     '/_marketing': {
       id: '/_marketing'
       path: ''
@@ -70,12 +83,22 @@ declare module '@tanstack/react-router' {
       path: '/auth/sign-in'
       fullPath: '/auth/sign-in'
       preLoaderRoute: typeof AuthAuthSignInImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof AuthImport
     }
   }
 }
 
 // Create and export the route tree
+
+interface AuthRouteChildren {
+  AuthAuthSignInRoute: typeof AuthAuthSignInRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthAuthSignInRoute: AuthAuthSignInRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface MarketingRouteChildren {
   MarketingIndexRoute: typeof MarketingIndexRoute
@@ -103,6 +126,7 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_auth': typeof AuthRouteWithChildren
   '/_marketing': typeof MarketingRouteWithChildren
   '/_protected': typeof ProtectedRoute
   '/_marketing/': typeof MarketingIndexRoute
@@ -116,6 +140,7 @@ export interface FileRouteTypes {
   to: '' | '/' | '/auth/sign-in'
   id:
     | '__root__'
+    | '/_auth'
     | '/_marketing'
     | '/_protected'
     | '/_marketing/'
@@ -124,15 +149,15 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
+  AuthRoute: typeof AuthRouteWithChildren
   MarketingRoute: typeof MarketingRouteWithChildren
   ProtectedRoute: typeof ProtectedRoute
-  AuthAuthSignInRoute: typeof AuthAuthSignInRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthRoute: AuthRouteWithChildren,
   MarketingRoute: MarketingRouteWithChildren,
   ProtectedRoute: ProtectedRoute,
-  AuthAuthSignInRoute: AuthAuthSignInRoute,
 }
 
 export const routeTree = rootRoute
@@ -145,8 +170,14 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_auth",
         "/_marketing",
-        "/_protected",
+        "/_protected"
+      ]
+    },
+    "/_auth": {
+      "filePath": "_auth.tsx",
+      "children": [
         "/_auth/auth/sign-in"
       ]
     },
@@ -164,7 +195,8 @@ export const routeTree = rootRoute
       "parent": "/_marketing"
     },
     "/_auth/auth/sign-in": {
-      "filePath": "_auth/auth/sign-in.tsx"
+      "filePath": "_auth/auth/sign-in.tsx",
+      "parent": "/_auth"
     }
   }
 }
