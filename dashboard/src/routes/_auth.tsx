@@ -5,7 +5,7 @@ import { LOGO_SMALL_URL } from "~/constants";
 export const Route = createFileRoute("/_auth")({
   beforeLoad: ({ context }) => {
     if (context.user) {
-      throw redirect({ to: "/" });
+      throw redirect({ to: "/dashboard" });
     }
   },
   component: RouteComponent,

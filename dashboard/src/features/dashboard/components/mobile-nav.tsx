@@ -9,7 +9,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer";
-import { UserButton } from "~/components/user-button";
+import { DARK_LOGO_URL, LIGHT_LOGO_URL } from "~/constants";
+import { UserButton } from "~/features/auth/components/user-button";
 import { NAV_LINKS } from "~/features/dashboard/constants";
 import { cn } from "~/lib/utils";
 
@@ -19,15 +20,20 @@ export function MobileNav() {
   return (
     <nav className="fixed top-0 left-0 z-50 flex h-16 w-full justify-center border-b border-gray-200 bg-white px-4 py-4 md:hidden dark:border-gray-800 dark:bg-gray-950">
       <div className="flex w-full items-center justify-between">
-        <Link to="/">
+        <Link to="/dashboard">
           <img
-            src="https://cdn.zenpa.xyz/3Cg5.svg"
-            alt="Logo"
-            className="h-8"
+            src={LIGHT_LOGO_URL}
+            alt="Planora logo"
+            className="h-8 dark:hidden"
+          />
+          <img
+            src={DARK_LOGO_URL}
+            alt="Planora logo"
+            className="hidden h-8 dark:block"
           />
         </Link>
         <div className="flex items-center gap-x-3">
-          <UserButton />
+          <UserButton variant="dashboard" />
           <Drawer>
             <DrawerTrigger asChild>
               <Button variant="tertiary" size="icon_md">
