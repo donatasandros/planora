@@ -61,7 +61,7 @@ export function MainNav() {
             to="/auth/sign-in"
             className={buttonVariants({ variant: "primary", size: "md" })}
           >
-            Sign in
+            Sign up
           </Link>
         </div>
       </div>
