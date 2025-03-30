@@ -36,8 +36,8 @@ function RouteComponent() {
               </p>
             </div>
             <div className="mb-16 flex flex-col-reverse items-center justify-center gap-3 md:flex-row">
-              <Link
-                to="/"
+              <a
+                href="#features"
                 className={buttonVariants({
                   variant: "secondary",
                   size: "lg",
@@ -45,7 +45,7 @@ function RouteComponent() {
                 })}
               >
                 Learn more
-              </Link>
+              </a>
               <a
                 href="/"
                 className={buttonVariants({
@@ -183,7 +183,10 @@ function RouteComponent() {
           </div>
         </div>
       </section>
-      <section className="mx-auto max-w-[1280px] px-4 pb-16 md:px-8 md:pb-24">
+      <section
+        id="features"
+        className="mx-auto max-w-[1280px] scroll-my-36 px-4 pb-16 md:scroll-my-44 md:px-8 md:pb-24"
+      >
         <div className="mx-auto mb-12 max-w-[768px] text-center md:mb-24">
           <div className="text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950 border-brand-200 dark:border-brand-800 mx-auto mb-4 w-fit rounded-full border px-2.5 py-0.5 text-sm font-medium md:px-3 md:py-1">
             Features

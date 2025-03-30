@@ -84,7 +84,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html className="scroll-smooth">
       <head>
         <HeadContent />
       </head>
