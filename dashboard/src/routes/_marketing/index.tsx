@@ -81,61 +81,63 @@ function RouteComponent() {
           className="from-brand-50 absolute inset-0 z-[0] h-full w-full bg-gradient-to-r from-40% to-white to-50% dark:from-gray-900 dark:to-gray-950"
         ></div>
       </section>
-      <section className="mx-auto max-w-[1280px] border-b border-gray-200 px-4 py-16 md:px-8 md:py-24 dark:border-gray-800">
-        <div className="mx-auto mb-12 max-w-[768px] text-center md:mb-16">
-          <div className="text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950 border-brand-200 dark:border-brand-800 mx-auto mb-4 w-fit rounded-full border px-2.5 py-0.5 text-sm font-medium md:px-3 md:py-1">
-            How it works
+      <section className="mx-auto max-w-[1280px] px-4 md:px-8">
+        <div className="border-b border-gray-200 py-16 md:py-24 dark:border-gray-800">
+          <div className="mx-auto mb-12 max-w-[768px] text-center md:mb-16">
+            <div className="text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950 border-brand-200 dark:border-brand-800 mx-auto mb-4 w-fit rounded-full border px-2.5 py-0.5 text-sm font-medium md:px-3 md:py-1">
+              How it works
+            </div>
+            <h2 className="mb-4 text-3xl font-semibold text-gray-900 md:mb-5 md:text-4xl dark:text-gray-50">
+              Seamless tracking, meaningful insights
+            </h2>
+            <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">
+              No setup, no hassle—just add the bot and track your presence
+              across apps using Discord Rich Presence. Get clear activity
+              insights effortlessly.
+            </p>
           </div>
-          <h2 className="mb-4 text-3xl font-semibold text-gray-900 md:mb-5 md:text-4xl dark:text-gray-50">
-            Seamless tracking, meaningful insights
-          </h2>
-          <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">
-            No setup, no hassle—just add the bot and track your presence across
-            apps using Discord Rich Presence. Get clear activity insights
-            effortlessly.
-          </p>
-        </div>
-        <div className="flex flex-col items-center gap-x-8 gap-y-10 md:flex-row">
-          <div className="text-center">
-            <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs md:size-12 dark:border-gray-700 dark:bg-gray-950">
-              <PlusIcon className="size-5 text-gray-700 md:size-6 dark:text-gray-300" />
+          <div className="flex flex-col items-center gap-x-8 gap-y-10 md:flex-row">
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs md:size-12 dark:border-gray-700 dark:bg-gray-950">
+                <PlusIcon className="size-5 text-gray-700 md:size-6 dark:text-gray-300" />
+              </div>
+              <div>
+                <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-50">
+                  Add the bot
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Invite the bot to your server, and it starts tracking your
+                  presence automatically—no configuration needed.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Add the bot
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Invite the bot to your server, and it starts tracking your
-                presence automatically—no configuration needed.
-              </p>
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs md:size-12 dark:border-gray-700 dark:bg-gray-950">
+                <ClockIcon className="size-5 text-gray-700 md:size-6 dark:text-gray-300" />
+              </div>
+              <div>
+                <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-50">
+                  Track your sessions
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  See a history of your activity across games, apps, and tools
+                  that support Discord Rich Presence.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="text-center">
-            <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs md:size-12 dark:border-gray-700 dark:bg-gray-950">
-              <ClockIcon className="size-5 text-gray-700 md:size-6 dark:text-gray-300" />
-            </div>
-            <div>
-              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Track your sessions
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                See a history of your activity across games, apps, and tools
-                that support Discord Rich Presence.
-              </p>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs md:size-12 dark:border-gray-700 dark:bg-gray-950">
-              <BarChartIcon className="size-5 text-gray-700 md:size-6 dark:text-gray-300" />
-            </div>
-            <div>
-              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-50">
-                View your insights
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Analyze your activity with detailed breakdowns of time spent in
-                different apps and sessions.
-              </p>
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex size-10 items-center justify-center rounded-[10px] border border-gray-300 bg-white shadow-xs md:size-12 dark:border-gray-700 dark:bg-gray-950">
+                <BarChartIcon className="size-5 text-gray-700 md:size-6 dark:text-gray-300" />
+              </div>
+              <div>
+                <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-gray-50">
+                  View your insights
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Analyze your activity with detailed breakdowns of time spent
+                  in different apps and sessions.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -322,71 +324,73 @@ function RouteComponent() {
           </div>
         </div>
       </section>
-      <section className="mx-auto max-w-[1280px] border-y border-gray-200 px-4 py-16 md:px-8 md:py-24 dark:border-gray-800">
-        <div className="mx-auto mb-12 max-w-[768px] text-center md:mb-16">
-          <h2 className="mb-4 text-3xl font-semibold text-gray-900 md:mb-5 md:text-4xl dark:text-gray-50">
-            Frequently asked questions
-          </h2>
-          <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">
-            Find answers to the most common questions about Planora.
-          </p>
-        </div>
-        <div className="mx-auto mb-12 max-w-[768px] md:mb-16">
-          <AccordionPrimitive.Root
-            type="single"
-            collapsible={true}
-            className="*:mb-8 *:border-t *:border-gray-200 *:pt-6 *:first:border-none *:first:pt-0 *:last:mb-0 *:dark:border-gray-800"
-          >
-            {FAQS.map((faq) => (
-              <AccordionPrimitive.Item key={faq.id} value={faq.title}>
-                <AccordionPrimitive.Header>
-                  <AccordionPrimitive.Trigger className="group flex w-full cursor-pointer items-center justify-between gap-x-2 md:gap-x-4">
-                    <p className="font-semibold text-gray-900 dark:text-gray-50">
-                      {faq.title}
-                    </p>
-                    <PlusCircleIcon className="size-6 text-gray-400 group-data-[state=open]:hidden dark:text-gray-600" />
-                    <MinusCircleIcon className="size-6 text-gray-400 group-data-[state=closed]:hidden dark:text-gray-600" />
-                  </AccordionPrimitive.Trigger>
-                </AccordionPrimitive.Header>
-                <AccordionPrimitive.Content className="mt-1 pr-8 text-gray-600 md:pr-10 dark:text-gray-400">
-                  {faq.description}
-                </AccordionPrimitive.Content>
-              </AccordionPrimitive.Item>
-            ))}
-          </AccordionPrimitive.Root>
-        </div>
-        <div className="mx-0 rounded-2xl bg-gray-50 px-5 py-8 text-center md:mx-8 md:px-8 md:pb-10 dark:bg-gray-900">
-          <div className="mb-6 flex items-center justify-center md:mb-8">
-            <img
-              src="https://cdn.discordapp.com/avatars/408587203703341058/a_c9424d260afbd5f79b38b01e7bf5f66d.png?size=1024"
-              alt="User"
-              className="-mr-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
-            />
-            <img
-              src="https://cdn.discordapp.com/avatars/559303647864029184/c9b56adc3979392208537ef0e7da8084.png?size=1024"
-              alt="User"
-              className="z-10 size-14 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
-            />
-            <img
-              src="https://cdn.discordapp.com/avatars/687065657270862025/2c99c318f1bf46fda4afbd7ddd89f2cb.png?size=1024"
-              alt="User"
-              className="-ml-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
-            />
-          </div>
-          <div>
-            <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-50">
-              Still have questions?
-            </h3>
-            <p className="mb-6 text-lg text-gray-600 md:mb-8 dark:text-gray-400">
-              Can't find the anwswer you're looking for? Please chat to our
-              friendly team.
+      <section className="mx-auto max-w-[1280px] px-4 md:px-8">
+        <div className="border-y border-gray-200 py-16 md:py-24 dark:border-gray-800">
+          <div className="mx-auto mb-12 max-w-[768px] text-center md:mb-16">
+            <h2 className="mb-4 text-3xl font-semibold text-gray-900 md:mb-5 md:text-4xl dark:text-gray-50">
+              Frequently asked questions
+            </h2>
+            <p className="text-lg text-gray-600 md:text-xl dark:text-gray-400">
+              Find answers to the most common questions about Planora.
             </p>
-            <a
-              href="/"
-              className={buttonVariants({ variant: "primary", size: "lg" })}
+          </div>
+          <div className="mx-auto mb-12 max-w-[768px] md:mb-16">
+            <AccordionPrimitive.Root
+              type="single"
+              collapsible={true}
+              className="*:mb-8 *:border-t *:border-gray-200 *:pt-6 *:first:border-none *:first:pt-0 *:last:mb-0 *:dark:border-gray-800"
             >
-              Get in touch
-            </a>
+              {FAQS.map((faq) => (
+                <AccordionPrimitive.Item key={faq.id} value={faq.title}>
+                  <AccordionPrimitive.Header>
+                    <AccordionPrimitive.Trigger className="group flex w-full cursor-pointer items-center justify-between gap-x-2 md:gap-x-4">
+                      <p className="font-semibold text-gray-900 dark:text-gray-50">
+                        {faq.title}
+                      </p>
+                      <PlusCircleIcon className="size-6 text-gray-400 group-data-[state=open]:hidden dark:text-gray-600" />
+                      <MinusCircleIcon className="size-6 text-gray-400 group-data-[state=closed]:hidden dark:text-gray-600" />
+                    </AccordionPrimitive.Trigger>
+                  </AccordionPrimitive.Header>
+                  <AccordionPrimitive.Content className="mt-1 pr-8 text-gray-600 md:pr-10 dark:text-gray-400">
+                    {faq.description}
+                  </AccordionPrimitive.Content>
+                </AccordionPrimitive.Item>
+              ))}
+            </AccordionPrimitive.Root>
+          </div>
+          <div className="mx-0 rounded-2xl bg-gray-50 px-5 py-8 text-center md:mx-8 md:px-8 md:pb-10 dark:bg-gray-900">
+            <div className="mb-6 flex items-center justify-center md:mb-8">
+              <img
+                src="https://cdn.discordapp.com/avatars/408587203703341058/a_c9424d260afbd5f79b38b01e7bf5f66d.png?size=1024"
+                alt="User"
+                className="-mr-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
+              />
+              <img
+                src="https://cdn.discordapp.com/avatars/559303647864029184/c9b56adc3979392208537ef0e7da8084.png?size=1024"
+                alt="User"
+                className="z-10 size-14 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
+              />
+              <img
+                src="https://cdn.discordapp.com/avatars/687065657270862025/2c99c318f1bf46fda4afbd7ddd89f2cb.png?size=1024"
+                alt="User"
+                className="-ml-3 size-12 rounded-full border-[1.5px] border-gray-50 dark:border-gray-900"
+              />
+            </div>
+            <div>
+              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-gray-50">
+                Still have questions?
+              </h3>
+              <p className="mb-6 text-lg text-gray-600 md:mb-8 dark:text-gray-400">
+                Can't find the anwswer you're looking for? Please chat to our
+                friendly team.
+              </p>
+              <a
+                href="/"
+                className={buttonVariants({ variant: "primary", size: "lg" })}
+              >
+                Get in touch
+              </a>
+            </div>
           </div>
         </div>
       </section>
