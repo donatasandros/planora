@@ -410,8 +410,8 @@ function RouteComponent() {
             setup.
           </p>
           <div className="flex flex-col-reverse items-center justify-center gap-3 md:flex-row">
-            <Link
-              to="/"
+            <a
+              href="/#features"
               className={buttonVariants({
                 variant: "secondary",
                 size: "lg",
@@ -419,17 +419,18 @@ function RouteComponent() {
               })}
             >
               Learn more
-            </Link>
-            <Link
-              to="/"
+            </a>
+            <a
+              href="/"
               className={buttonVariants({
                 variant: "primary",
                 size: "lg",
                 class: "max-md:w-full",
               })}
             >
-              Get started
-            </Link>
+              <FaDiscord />
+              Add Planora
+            </a>
           </div>
         </div>
       </section>
