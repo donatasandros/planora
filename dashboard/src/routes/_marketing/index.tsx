@@ -46,8 +46,8 @@ function RouteComponent() {
               >
                 Learn more
               </Link>
-              <Link
-                to="/auth/sign-in"
+              <a
+                href="/"
                 className={buttonVariants({
                   variant: "primary",
                   size: "lg",
@@ -56,7 +56,7 @@ function RouteComponent() {
               >
                 <FaDiscord />
                 Add Planora
-              </Link>
+              </a>
             </div>
           </div>
         </div>
