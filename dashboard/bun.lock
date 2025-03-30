@@ -25,6 +25,7 @@
         "drizzle-orm": "^0.40.1",
         "jose": "^6.0.10",
         "lucide-react": "^0.483.0",
+        "next-themes": "^0.4.6",
         "nuqs": "^2.4.1",
         "pg": "^8.14.1",
         "react": "^19.0.0",
@@ -1429,6 +1430,8 @@
     "nanostores": ["nanostores@0.11.4", "", {}, "sha512-k1oiVNN4hDK8NcNERSZLQiMfRzEGtfnvZvdBvey3SQbgn8Dcrk0h1I6vpxApjb10PFUflZrgJ2WEZyJQ+5v7YQ=="],
 
     "natural-compare": ["natural-compare@1.4.0", "", {}, "sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw=="],
+
+    "next-themes": ["next-themes@0.4.6", "", { "peerDependencies": { "react": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc", "react-dom": "^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc" } }, "sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA=="],
 
     "nitropack": ["nitropack@2.11.6", "", { "dependencies": { "@cloudflare/kv-asset-handler": "^0.3.4", "@netlify/functions": "3.0.0", "@rollup/plugin-alias": "^5.1.1", "@rollup/plugin-commonjs": "^28.0.3", "@rollup/plugin-inject": "^5.0.5", "@rollup/plugin-json": "^6.1.0", "@rollup/plugin-node-resolve": "^16.0.0", "@rollup/plugin-replace": "^6.0.2", "@rollup/plugin-terser": "^0.4.4", "@types/http-proxy": "^1.17.16", "@vercel/nft": "^0.29.2", "archiver": "^7.0.1", "c12": "^3.0.2", "chokidar": "^4.0.3", "citty": "^0.1.6", "compatx": "^0.1.8", "confbox": "^0.2.1", "consola": "^3.4.0", "cookie-es": "^2.0.0", "croner": "^9.0.0", "crossws": "^0.3.4", "db0": "^0.3.1", "defu": "^6.1.4", "destr": "^2.0.3", "dot-prop": "^9.0.0", "esbuild": "^0.25.0", "escape-string-regexp": "^5.0.0", "etag": "^1.8.1", "exsolve": "^1.0.4", "fs-extra": "^11.3.0", "globby": "^14.1.0", "gzip-size": "^7.0.0", "h3": "^1.15.1", "hookable": "^5.5.3", "httpxy": "^0.1.7", "ioredis": "^5.6.0", "jiti": "^2.4.2", "klona": "^2.0.6", "knitwork": "^1.2.0", "listhen": "^1.9.0", "magic-string": "^0.30.17", "magicast": "^0.3.5", "mime": "^4.0.6", "mlly": "^1.7.4", "node-fetch-native": "^1.6.6", "node-mock-http": "^1.0.0", "ofetch": "^1.4.1", "ohash": "^2.0.11", "openapi-typescript": "^7.6.1", "pathe": "^2.0.3", "perfect-debounce": "^1.0.0", "pkg-types": "^2.1.0", "pretty-bytes": "^6.1.1", "radix3": "^1.1.2", "rollup": "^4.35.0", "rollup-plugin-visualizer": "^5.14.0", "scule": "^1.3.0", "semver": "^7.7.1", "serve-placeholder": "^2.0.2", "serve-static": "^1.16.2", "source-map": "^0.7.4", "std-env": "^3.8.1", "ufo": "^1.5.4", "ultrahtml": "^1.5.3", "uncrypto": "^0.1.3", "unctx": "^2.4.1", "unenv": "^2.0.0-rc.14", "unimport": "^4.1.2", "unplugin-utils": "^0.2.4", "unstorage": "^1.15.0", "untyped": "^2.0.0", "unwasm": "^0.3.9", "youch": "^4.1.0-beta.6", "youch-core": "^0.3.2" }, "peerDependencies": { "xml2js": "^0.6.2" }, "optionalPeers": ["xml2js"], "bin": { "nitro": "dist/cli/index.mjs", "nitropack": "dist/cli/index.mjs" } }, "sha512-iaLzOKYxsNL8G6h9cMFTC/hAN4RfhZsrFzFFzemr6Vfn57MooYEz6KLeUoRyTposlAeEWTVejz8naYOORIrnDg=="],
 
