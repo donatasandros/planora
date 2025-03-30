@@ -10,6 +10,7 @@ import {
   PlusCircleIcon,
   PlusIcon,
 } from "lucide-react";
+import { FaDiscord } from "react-icons/fa6";
 
 import { buttonVariants } from "~/components/ui/button";
 import { FAQS } from "~/features/marketing/constants";
@@ -46,14 +47,15 @@ function RouteComponent() {
                 Learn more
               </Link>
               <Link
-                to="/"
+                to="/auth/sign-in"
                 className={buttonVariants({
                   variant: "primary",
                   size: "lg",
                   class: "max-md:w-full",
                 })}
               >
-                Get started
+                <FaDiscord />
+                Add Planora
               </Link>
             </div>
           </div>
