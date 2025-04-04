@@ -105,7 +105,6 @@ export function UserButton({ variant }: UserButtonsProps) {
 
           <DropdownMenuItem
             onClick={(e) => {
-              e.preventDefault();
               setTheme(theme === "light" ? "dark" : "light");
             }}
           >
