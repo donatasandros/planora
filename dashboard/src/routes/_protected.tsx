@@ -19,7 +19,7 @@ function RouteComponent() {
     <div>
       <MainNav />
       <MobileNav />
-      <main className="h-screen bg-gray-50 pt-16 md:pt-18 dark:bg-gray-950">
+      <main className="h-screen bg-white pt-24 pb-8 md:pt-30 md:pb-12 dark:bg-gray-950">
         <Outlet />
       </main>
     </div>

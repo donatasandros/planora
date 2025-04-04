@@ -17,7 +17,7 @@ export function MainNav() {
   const router = useRouterState();
 
   return (
-    <nav className="fixed top-0 left-0 z-50 flex h-18 w-full justify-center border-b border-gray-200 bg-white px-8 py-4 max-md:hidden dark:border-gray-800 dark:bg-gray-950">
+    <nav className="fixed top-0 left-0 z-100 flex h-18 w-full justify-center border-b border-gray-200 bg-white px-8 py-4 max-md:hidden dark:border-gray-800 dark:bg-gray-950">
       <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between">
         <div className="flex items-center gap-x-4">
           <Link to="/dashboard">
@@ -34,7 +34,7 @@ export function MainNav() {
           </Link>
           <ul className="flex items-center gap-x-0.5">
             {NAV_LINKS.map((link) => (
-              <li key={link.id}>
+              <li key={`${link.id}-desktop`}>
                 {!link.children ? (
                   <Link
                     to={link.to}
@@ -71,7 +71,7 @@ export function MainNav() {
                     >
                       {link.children.map((subLink) => (
                         <DropdownMenuItem
-                          key={subLink.id}
+                          key={`${subLink.id}-desktop`}
                           className="cursor-pointer p-3"
                           asChild
                         >

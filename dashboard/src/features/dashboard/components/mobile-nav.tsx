@@ -18,7 +18,7 @@ export function MobileNav() {
   const router = useRouterState();
 
   return (
-    <nav className="fixed top-0 left-0 z-50 flex h-16 w-full justify-center border-b border-gray-200 bg-white px-4 py-4 md:hidden dark:border-gray-800 dark:bg-gray-950">
+    <nav className="fixed top-0 left-0 z-100 flex h-16 w-full justify-center border-b border-gray-200 bg-white px-4 py-4 md:hidden dark:border-gray-800 dark:bg-gray-950">
       <div className="flex w-full items-center justify-between">
         <Link to="/dashboard">
           <img
@@ -45,7 +45,7 @@ export function MobileNav() {
               <div className="flex flex-col gap-4 py-6">
                 <ul className="space-y-0.5">
                   {NAV_LINKS.map((link) => (
-                    <li key={link.id}>
+                    <li key={`${link.id}-mobile`}>
                       {!link.children ? (
                         <Link
                           to={link.to}
@@ -87,7 +87,7 @@ export function MobileNav() {
                               <div className="flex flex-col gap-1">
                                 {link.children.map((subLink) => (
                                   <Link
-                                    key={subLink.id}
+                                    key={`${subLink.id}-mobile`}
                                     to={subLink.to}
                                     className={cn(
                                       "flex items-start gap-x-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800",
