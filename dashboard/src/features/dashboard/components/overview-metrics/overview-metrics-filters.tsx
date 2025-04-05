@@ -43,7 +43,8 @@ export function OverviewMetricsFilters() {
   function onTabValueChange(value: string) {
     navigate({
       from: "/dashboard",
-      search: () => ({
+      search: (prev) => ({
+        ...prev,
         metrics_tf: value,
         metrics_cr: undefined,
       }),
@@ -111,7 +112,8 @@ export function OverviewMetricsFilters() {
 
                   navigate({
                     from: "/dashboard",
-                    search: () => ({
+                    search: (prev) => ({
+                      ...prev,
                       metrics_tf: undefined,
                       metrics_cr: [from, to] as [string, string],
                     }),

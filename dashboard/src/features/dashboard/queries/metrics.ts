@@ -3,13 +3,17 @@ import { createServerFn } from "@tanstack/react-start";
 import {
   addDays,
   differenceInDays,
+  eachDayOfInterval,
+  eachMonthOfInterval,
+  format,
   getUnixTime,
   startOfDay,
+  startOfMonth,
   subDays,
   subHours,
   subMonths,
 } from "date-fns";
-import { and, countDistinct, eq, gte, lte, max, sum } from "drizzle-orm";
+import { and, countDistinct, eq, gte, lte, max, sql, sum } from "drizzle-orm";
 
 import type { z } from "zod";
 
@@ -19,13 +23,16 @@ import { getCurrentUser } from "~/features/auth/functions/get-current-user";
 import { calculateDeltaDifference } from "~/features/dashboard/helpers/calculate-delta-difference";
 import { overviewParamsSchema } from "~/features/dashboard/schemas";
 
-const fetchMetricsSchema = overviewParamsSchema;
+const fetchMetricsSchema = overviewParamsSchema.pick({
+  metrics_tf: true,
+  metrics_cr: true,
+});
 
 function getFilterTimestamps(
   timeFilter: z.infer<typeof fetchMetricsSchema>["metrics_tf"],
-  customRange: z.infer<typeof fetchMetricsSchema>["metrics_cr"],
+  customRange?: z.infer<typeof fetchMetricsSchema>["metrics_cr"],
 ) {
-  const now = startOfDay(new Date());
+  const now = new Date();
   const currentTimestamp = getUnixTime(now);
 
   if (timeFilter) {
@@ -164,5 +171,85 @@ export const metricsQueryOptions = (data: z.infer<typeof fetchMetricsSchema>) =>
       fetchMetrics({
         data,
       }),
+    staleTime: 60 * 1_000,
+  });
+
+const fetchTimeSpentSchema = overviewParamsSchema.pick({
+  chart_tf: true,
+});
+
+export const fetchTimeSpent = createServerFn({ method: "GET" })
+  .validator(fetchTimeSpentSchema)
+  .handler(async ({ data }) => {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const chartTf = data.chart_tf || "12m";
+
+    const config = {
+      "12m": {
+        trunc: "month",
+        range: eachMonthOfInterval({
+          start: subMonths(startOfMonth(new Date()), 11),
+          end: startOfMonth(new Date()),
+        }),
+        formatKey: (date: Date) => format(date, "yyyy-MM"),
+      },
+      "30d": {
+        trunc: "day",
+        range: eachDayOfInterval({
+          start: subDays(startOfDay(new Date()), 29),
+          end: startOfDay(new Date()), // today
+        }),
+        formatKey: (date: Date) => format(date, "yyyy-MM-dd"),
+      },
+      "7d": {
+        trunc: "day",
+        range: eachDayOfInterval({
+          start: subDays(startOfDay(new Date()), 6),
+          end: startOfDay(new Date()), // today
+        }),
+        formatKey: (date: Date) => format(date, "yyyy-MM-dd"),
+      },
+    } as const;
+
+    const { trunc, range, formatKey } = config[chartTf];
+
+    const loxas = await db
+      .select({
+        date: sql<Date>`DATE_TRUNC(${sql.raw(`'${trunc}'`)}, TO_TIMESTAMP(start_time))`,
+        totalTimeSpent: sum(activitiesTable.total_time),
+      })
+      .from(activitiesTable)
+      .where(eq(activitiesTable.user_id, user.discordId ?? user.id))
+      .groupBy(
+        sql`DATE_TRUNC(${sql.raw(`'${trunc}'`)}, TO_TIMESTAMP(start_time))`,
+      )
+      .orderBy(
+        sql`DATE_TRUNC(${sql.raw(`'${trunc}'`)}, TO_TIMESTAMP(start_time))`,
+      );
+
+    // Index and fill gaps
+    const indexed = Object.fromEntries(
+      loxas.map((d) => [formatKey(new Date(d.date)), Number(d.totalTimeSpent)]),
+    );
+
+    const filled = range.map((date) => ({
+      date, // raw Date object
+      totalTimeSpent: indexed[formatKey(date)] ?? 0,
+    }));
+
+    return filled;
+  });
+
+export const timeSpentQueryOptions = (
+  data: z.infer<typeof fetchTimeSpentSchema>,
+) =>
+  queryOptions({
+    queryKey: ["timeSpent", data.chart_tf],
+    queryFn: () => fetchTimeSpent({ data }),
     staleTime: 60 * 1_000,
   });

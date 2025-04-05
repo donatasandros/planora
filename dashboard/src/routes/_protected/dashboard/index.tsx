@@ -2,27 +2,39 @@ import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { OverviewMetrics } from "~/features/dashboard/components/overview-metrics";
-import { metricsQueryOptions } from "~/features/dashboard/queries/metrics";
+import { TimeSpentChart } from "~/features/dashboard/components/time-spent-chart";
+import {
+  metricsQueryOptions,
+  timeSpentQueryOptions,
+} from "~/features/dashboard/queries/metrics";
 import { overviewParamsSchema } from "~/features/dashboard/schemas";
 import { getInitials } from "~/utils/get-initials";
 
 export const Route = createFileRoute("/_protected/dashboard/")({
   validateSearch: overviewParamsSchema,
-  loaderDeps: ({ search: { metrics_tf, metrics_cr } }) => ({
+  loaderDeps: ({ search: { metrics_tf, metrics_cr, chart_tf } }) => ({
     metrics_tf,
     metrics_cr,
+    chart_tf,
   }),
   loader: async ({ context, deps }) => {
-    await context.queryClient.ensureQueryData(
-      metricsQueryOptions({
-        metrics_tf: deps.metrics_tf
-          ? deps.metrics_tf
-          : deps.metrics_cr
-            ? undefined
-            : "all",
-        metrics_cr: deps.metrics_cr,
-      }),
-    );
+    await Promise.all([
+      await context.queryClient.ensureQueryData(
+        metricsQueryOptions({
+          metrics_tf: deps.metrics_tf
+            ? deps.metrics_tf
+            : deps.metrics_cr
+              ? undefined
+              : "all",
+          metrics_cr: deps.metrics_cr,
+        }),
+      ),
+      await context.queryClient.ensureQueryData(
+        timeSpentQueryOptions({
+          chart_tf: deps.chart_tf || "12m",
+        }),
+      ),
+    ]);
   },
   component: RouteComponent,
 });
@@ -57,6 +69,7 @@ function RouteComponent() {
         </div>
       </section>
       <OverviewMetrics />
+      <TimeSpentChart />
     </div>
   );
 }
