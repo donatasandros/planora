@@ -30,3 +30,27 @@ export const recentActivityQueryOptions = queryOptions({
   queryFn: fetchRecentActivity,
   staleTime: 60 * 1_000,
 });
+
+export const fetchActivity = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const activity = await db
+      .select()
+      .from(activitiesTable)
+      .where(eq(activitiesTable.user_id, user.discordId ?? user.id))
+      .orderBy(desc(activitiesTable.end_time));
+
+    return activity;
+  },
+);
+
+export const activityQueryOptions = queryOptions({
+  queryKey: ["activity"],
+  queryFn: fetchActivity,
+  staleTime: 60 * 1_000,
+});

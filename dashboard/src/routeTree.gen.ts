@@ -17,6 +17,7 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as MarketingIndexImport } from './routes/_marketing/index'
 import { Route as ProtectedDashboardIndexImport } from './routes/_protected/dashboard/index'
 import { Route as AuthAuthSignInImport } from './routes/_auth/auth/sign-in'
+import { Route as ProtectedDashboardActivityIndexImport } from './routes/_protected/dashboard/activity/index'
 
 // Create/Update Routes
 
@@ -52,6 +53,13 @@ const AuthAuthSignInRoute = AuthAuthSignInImport.update({
   path: '/auth/sign-in',
   getParentRoute: () => AuthRoute,
 } as any)
+
+const ProtectedDashboardActivityIndexRoute =
+  ProtectedDashboardActivityIndexImport.update({
+    id: '/dashboard/activity/',
+    path: '/dashboard/activity/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -99,6 +107,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardIndexImport
       parentRoute: typeof ProtectedImport
     }
+    '/_protected/dashboard/activity/': {
+      id: '/_protected/dashboard/activity/'
+      path: '/dashboard/activity'
+      fullPath: '/dashboard/activity'
+      preLoaderRoute: typeof ProtectedDashboardActivityIndexImport
+      parentRoute: typeof ProtectedImport
+    }
   }
 }
 
@@ -128,10 +143,12 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 
 interface ProtectedRouteChildren {
   ProtectedDashboardIndexRoute: typeof ProtectedDashboardIndexRoute
+  ProtectedDashboardActivityIndexRoute: typeof ProtectedDashboardActivityIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedDashboardIndexRoute: ProtectedDashboardIndexRoute,
+  ProtectedDashboardActivityIndexRoute: ProtectedDashboardActivityIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -143,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
   '/auth/sign-in': typeof AuthAuthSignInRoute
   '/dashboard': typeof ProtectedDashboardIndexRoute
+  '/dashboard/activity': typeof ProtectedDashboardActivityIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -150,6 +168,7 @@ export interface FileRoutesByTo {
   '/': typeof MarketingIndexRoute
   '/auth/sign-in': typeof AuthAuthSignInRoute
   '/dashboard': typeof ProtectedDashboardIndexRoute
+  '/dashboard/activity': typeof ProtectedDashboardActivityIndexRoute
 }
 
 export interface FileRoutesById {
@@ -160,13 +179,14 @@ export interface FileRoutesById {
   '/_marketing/': typeof MarketingIndexRoute
   '/_auth/auth/sign-in': typeof AuthAuthSignInRoute
   '/_protected/dashboard/': typeof ProtectedDashboardIndexRoute
+  '/_protected/dashboard/activity/': typeof ProtectedDashboardActivityIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/auth/sign-in' | '/dashboard'
+  fullPaths: '' | '/' | '/auth/sign-in' | '/dashboard' | '/dashboard/activity'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/' | '/auth/sign-in' | '/dashboard'
+  to: '' | '/' | '/auth/sign-in' | '/dashboard' | '/dashboard/activity'
   id:
     | '__root__'
     | '/_auth'
@@ -175,6 +195,7 @@ export interface FileRouteTypes {
     | '/_marketing/'
     | '/_auth/auth/sign-in'
     | '/_protected/dashboard/'
+    | '/_protected/dashboard/activity/'
   fileRoutesById: FileRoutesById
 }
 
@@ -220,7 +241,8 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected.tsx",
       "children": [
-        "/_protected/dashboard/"
+        "/_protected/dashboard/",
+        "/_protected/dashboard/activity/"
       ]
     },
     "/_marketing/": {
@@ -233,6 +255,10 @@ export const routeTree = rootRoute
     },
     "/_protected/dashboard/": {
       "filePath": "_protected/dashboard/index.tsx",
+      "parent": "/_protected"
+    },
+    "/_protected/dashboard/activity/": {
+      "filePath": "_protected/dashboard/activity/index.tsx",
       "parent": "/_protected"
     }
   }

@@ -23,7 +23,7 @@ export function RecentActivities() {
         </div>
         <div>
           <Link
-            to="/dashboard"
+            to="/dashboard/activity"
             className={buttonVariants({ variant: "primary", size: "md" })}
           >
             View all
