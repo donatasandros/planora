@@ -67,7 +67,7 @@ export function MainNav() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="center"
-                      className="w-84 space-y-0.5 p-2"
+                      className="z-100 w-84 space-y-0.5 p-2"
                     >
                       {link.children.map((subLink) => (
                         <DropdownMenuItem
