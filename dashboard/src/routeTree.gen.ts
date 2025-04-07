@@ -15,6 +15,7 @@ import { Route as ProtectedImport } from './routes/_protected'
 import { Route as MarketingImport } from './routes/_marketing'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as MarketingIndexImport } from './routes/_marketing/index'
+import { Route as ProtectedDashboardIndexImport } from './routes/_protected/dashboard/index'
 import { Route as AuthAuthSignInImport } from './routes/_auth/auth/sign-in'
 
 // Create/Update Routes
@@ -38,6 +39,12 @@ const MarketingIndexRoute = MarketingIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MarketingRoute,
+} as any)
+
+const ProtectedDashboardIndexRoute = ProtectedDashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 
 const AuthAuthSignInRoute = AuthAuthSignInImport.update({
@@ -85,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAuthSignInImport
       parentRoute: typeof AuthImport
     }
+    '/_protected/dashboard/': {
+      id: '/_protected/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ProtectedDashboardIndexImport
+      parentRoute: typeof ProtectedImport
+    }
   }
 }
 
@@ -112,32 +126,47 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
   MarketingRouteChildren,
 )
 
+interface ProtectedRouteChildren {
+  ProtectedDashboardIndexRoute: typeof ProtectedDashboardIndexRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedDashboardIndexRoute: ProtectedDashboardIndexRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
-  '': typeof ProtectedRoute
+  '': typeof ProtectedRouteWithChildren
   '/': typeof MarketingIndexRoute
   '/auth/sign-in': typeof AuthAuthSignInRoute
+  '/dashboard': typeof ProtectedDashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '': typeof ProtectedRoute
+  '': typeof ProtectedRouteWithChildren
   '/': typeof MarketingIndexRoute
   '/auth/sign-in': typeof AuthAuthSignInRoute
+  '/dashboard': typeof ProtectedDashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_marketing': typeof MarketingRouteWithChildren
-  '/_protected': typeof ProtectedRoute
+  '/_protected': typeof ProtectedRouteWithChildren
   '/_marketing/': typeof MarketingIndexRoute
   '/_auth/auth/sign-in': typeof AuthAuthSignInRoute
+  '/_protected/dashboard/': typeof ProtectedDashboardIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/auth/sign-in'
+  fullPaths: '' | '/' | '/auth/sign-in' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/' | '/auth/sign-in'
+  to: '' | '/' | '/auth/sign-in' | '/dashboard'
   id:
     | '__root__'
     | '/_auth'
@@ -145,19 +174,20 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/_marketing/'
     | '/_auth/auth/sign-in'
+    | '/_protected/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   MarketingRoute: typeof MarketingRouteWithChildren
-  ProtectedRoute: typeof ProtectedRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   MarketingRoute: MarketingRouteWithChildren,
-  ProtectedRoute: ProtectedRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -188,7 +218,10 @@ export const routeTree = rootRoute
       ]
     },
     "/_protected": {
-      "filePath": "_protected.tsx"
+      "filePath": "_protected.tsx",
+      "children": [
+        "/_protected/dashboard/"
+      ]
     },
     "/_marketing/": {
       "filePath": "_marketing/index.tsx",
@@ -197,6 +230,10 @@ export const routeTree = rootRoute
     "/_auth/auth/sign-in": {
       "filePath": "_auth/auth/sign-in.tsx",
       "parent": "/_auth"
+    },
+    "/_protected/dashboard/": {
+      "filePath": "_protected/dashboard/index.tsx",
+      "parent": "/_protected"
     }
   }
 }

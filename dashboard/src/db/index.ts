@@ -5,5 +5,4 @@ import * as schema from "~/db/schemas";
 
 export const db = drizzle(process.env.DATABASE_URL!, {
   schema,
-  logger: true,
 });

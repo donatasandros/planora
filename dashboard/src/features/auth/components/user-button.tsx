@@ -1,5 +1,6 @@
 import { Link, useRouteContext, useRouter } from "@tanstack/react-router";
 import {
+  AwardIcon,
   LayoutGridIcon,
   LogOutIcon,
   MoonIcon,
@@ -21,7 +22,11 @@ import {
 import { authClient } from "~/lib/auth-client";
 import { getInitials } from "~/utils/get-initials";
 
-export function UserButton() {
+interface UserButtonsProps {
+  variant: "marketing" | "dashboard";
+}
+
+export function UserButton({ variant }: UserButtonsProps) {
   const router = useRouter();
   const { user } = useRouteContext({
     from: "__root__",
@@ -82,15 +87,24 @@ export function UserButton() {
               View profile
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to="/">
-              <LayoutGridIcon />
-              Dashboard
-            </Link>
-          </DropdownMenuItem>
+          {variant === "marketing" ? (
+            <DropdownMenuItem asChild>
+              <Link to="/dashboard">
+                <LayoutGridIcon />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem asChild>
+              <Link to="/">
+                <AwardIcon />
+                Achievements
+              </Link>
+            </DropdownMenuItem>
+          )}
+
           <DropdownMenuItem
             onClick={(e) => {
-              e.preventDefault();
               setTheme(theme === "light" ? "dark" : "light");
             }}
           >

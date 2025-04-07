@@ -57,7 +57,7 @@ export function MainNav() {
           </Link>
         </div>
         {user ? (
-          <UserButton />
+          <UserButton variant="marketing" />
         ) : (
           <div className="flex items-center gap-x-3">
             <Link
