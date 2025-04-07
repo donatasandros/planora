@@ -232,13 +232,12 @@ export const fetchTimeSpent = createServerFn({ method: "GET" })
         sql`DATE_TRUNC(${sql.raw(`'${trunc}'`)}, TO_TIMESTAMP(start_time))`,
       );
 
-    // Index and fill gaps
     const indexed = Object.fromEntries(
       loxas.map((d) => [formatKey(new Date(d.date)), Number(d.totalTimeSpent)]),
     );
 
     const filled = range.map((date) => ({
-      date, // raw Date object
+      date,
       totalTimeSpent: indexed[formatKey(date)] ?? 0,
     }));
 

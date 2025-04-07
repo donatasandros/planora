@@ -2,6 +2,7 @@ import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { OverviewMetrics } from "~/features/dashboard/components/overview-metrics";
+import { RecentActivities } from "~/features/dashboard/components/recent-activities";
 import { TimeSpentChart } from "~/features/dashboard/components/time-spent-chart";
 import {
   metricsQueryOptions,
@@ -70,6 +71,7 @@ function RouteComponent() {
       </section>
       <OverviewMetrics />
       <TimeSpentChart />
+      <RecentActivities />
     </div>
   );
 }
