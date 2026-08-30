@@ -12,7 +12,7 @@ export function formatTime(
   if (format.includes("hours")) {
     const h = Math.floor(remainingSeconds / 3600)
     if (h > 0 || hasStarted) {
-      parts.push(`${h}h`)
+      parts.push(`${h} h`)
       hasStarted = true
     }
     remainingSeconds %= 3600
@@ -21,7 +21,7 @@ export function formatTime(
   if (format.includes("minutes")) {
     const m = Math.floor(remainingSeconds / 60)
     if (m > 0 || hasStarted) {
-      parts.push(`${m}m`)
+      parts.push(`${m} m`)
       hasStarted = true
     }
     remainingSeconds %= 60
@@ -30,10 +30,10 @@ export function formatTime(
   if (format.includes("seconds")) {
     const s = remainingSeconds
     if (s > 0 || hasStarted) {
-      parts.push(`${s}s`)
+      parts.push(`${s} s`)
       hasStarted = true
     }
   }
 
-  return parts.length > 0 ? parts.join(" ") : "0s"
+  return parts.length > 0 ? parts.join(" ") : "0 s"
 }
