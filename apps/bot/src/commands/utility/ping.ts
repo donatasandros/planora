@@ -4,11 +4,11 @@ import {
   EmbedBuilder,
   SlashCommandBuilder,
 } from "discord.js"
-import { formatTime } from "@/helpers/time"
+import { formatTime } from "@/utils/time"
 
 export const data = new SlashCommandBuilder()
   .setName("ping")
-  .setDescription("ping description")
+  .setDescription("Check the bot's response time and websocket latency.")
 
 export async function execute(client: Client, interaction: CommandInteraction) {
   await interaction.deferReply()
@@ -23,8 +23,8 @@ export async function execute(client: Client, interaction: CommandInteraction) {
     .setColor(0x8762e4)
     .setTitle("Pong!")
     .setDescription(
-      `• Client latency: \`${clientLatency}ms\`\n` +
-        `• API latency: \`${websocketLatency}ms\`\n` +
+      `• Client latency: \`${clientLatency} ms\`\n` +
+        `• Websocket latency: \`${websocketLatency} ms\`\n` +
         `• Uptime: \`${botUptime}\``
     )
 

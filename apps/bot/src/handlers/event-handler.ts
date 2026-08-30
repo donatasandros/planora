@@ -2,8 +2,8 @@ import fs from "node:fs"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
 import { type Client, type ClientEvents, Events } from "discord.js"
-import { kebabToCamel } from "@/helpers/string"
 import { logger } from "@/lib/logger"
+import { kebabToCamel } from "@/utils/string"
 
 type EventKey = keyof ClientEvents
 type HandlerFn<K extends EventKey = EventKey> = (
