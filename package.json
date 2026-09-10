@@ -11,11 +11,11 @@
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.9",
-    "turbo": "^2.9.18",
-    "typescript": "^6"
+    "@biomejs/biome": "2.5.12",
+    "turbo": "^2.10.12",
+    "typescript": "^7.0.2"
   },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@12.3.4",
   "engines": {
     "node": ">=20"
   }

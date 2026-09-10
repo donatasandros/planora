@@ -10,13 +10,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "ioredis": "^6.0.0",
-    "@workspace/logger": "workspace:*"
+    "@workspace/logger": "workspace:*",
+    "ioredis": "^6.0.0"
   },
   "devDependencies": {
-    "@turbo/gen": "^2.9.15",
-    "@types/node": "^26.4.0",
-    "typescript": "^6"
+    "@turbo/gen": "^2.10.12",
+    "@types/node": "^26.4.1",
+    "typescript": "^7.0.2"
   },
   "exports": {
     ".": "./src/index.ts"
