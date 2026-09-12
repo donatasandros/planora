@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto"
-import { claim } from "@workspace/redis"
+import { acquireLock, claim, releaseLock } from "@workspace/redis"
 import type { Client, Presence } from "discord.js"
 import {
   type ActiveActivitySessions,
@@ -15,6 +15,7 @@ import {
 import { getTrackingUser } from "@/lib/bot-users"
 import { logger } from "@/lib/logger"
 
+const USER_ACTIVITY_LOCK_TTL_SECONDS = 30
 const PRESENCE_DEDUPLICATION_TTL_SECONDS = 10
 
 function getPresenceFingerprint(presence: Presence): string {
@@ -69,82 +70,82 @@ export default async function trackPresence(
     return
   }
 
-  const user = await getTrackingUser(userId)
+  const lockKey = `activity:user:${userId}:lock`
+  const lockToken = await acquireLock(lockKey, USER_ACTIVITY_LOCK_TTL_SECONDS)
 
-  let previousSessions: ActiveActivitySessions = {}
+  if (!lockToken) {
+    logger.debug({ userId }, "Skipped presence update because user is locked")
+    return
+  }
 
   try {
-    previousSessions = await getActiveSessions(userId)
-  } catch (err) {
-    logger.warn(
-      { err, userId },
-      "Skipping presence update due to active session state being unavailable"
-    )
+    const user = await getTrackingUser(userId)
+    const previousSessions = await getActiveSessions(userId)
 
-    return
-  }
+    if (!user.isTrackingEnabled || user.isBlacklisted) {
+      if (Object.keys(previousSessions).length > 0) {
+        const endedAt = Math.floor(Date.now() / 1000)
 
-  if (!user.isTrackingEnabled || user.isBlacklisted) {
-    if (Object.keys(previousSessions).length > 0) {
-      const endedAt = Math.floor(Date.now() / 1000)
+        await finishSessions(previousSessions, endedAt)
+        await saveActiveSessions(userId, {})
+      }
 
-      await finishSessions(previousSessions, endedAt)
-      await saveActiveSessions(userId, {})
+      return
     }
 
-    return
-  }
+    const nextSessions: ActiveActivitySessions = {}
 
-  const nextSessions: ActiveActivitySessions = {}
+    for (const activity of newPresence.activities) {
+      const activityKey = getActivityKey(activity)
+      const existingSession = previousSessions[activityKey]
 
-  for (const activity of newPresence.activities) {
-    const activityKey = getActivityKey(activity)
-    const existingSession = previousSessions[activityKey]
+      if (existingSession) {
+        nextSessions[activityKey] = existingSession
+        continue
+      }
 
-    if (existingSession) {
-      nextSessions[activityKey] = existingSession
-      continue
+      const session = createSession(activity, getActivityStartTime(activity))
+
+      await createActivitySession(userId, session)
+
+      nextSessions[activityKey] = session
+
+      logger.debug(
+        {
+          userId,
+          activity: session.activityName,
+          sessionId: session.id,
+          startedAt: session.startedAt,
+        },
+        "Started activity session"
+      )
     }
 
-    const session = createSession(activity, getActivityStartTime(activity))
+    const endedAt = Math.floor(Date.now() / 1000)
 
-    await createActivitySession(userId, session)
+    for (const [activityKey, session] of Object.entries(previousSessions)) {
+      if (nextSessions[activityKey]) {
+        continue
+      }
 
-    nextSessions[activityKey] = session
+      const durationSeconds = Math.max(0, endedAt - session.startedAt)
 
-    logger.debug(
-      {
-        userId,
-        activity: session.activityName,
-        sessionId: session.id,
-        startedAt: session.startedAt,
-      },
-      "Started activity session"
-    )
-  }
+      await finishActivitySession(session.id, endedAt, durationSeconds)
 
-  const endedAt = Math.floor(Date.now() / 1000)
-
-  for (const [activityKey, session] of Object.entries(previousSessions)) {
-    if (nextSessions[activityKey]) {
-      continue
+      logger.debug(
+        {
+          userId,
+          activity: session.activityName,
+          sessionId: session.id,
+          endedAt,
+          durationSeconds,
+        },
+        "Finished activity session"
+      )
     }
 
-    const durationSeconds = Math.max(0, endedAt - session.startedAt)
-
-    await finishActivitySession(session.id, endedAt, durationSeconds)
-
-    logger.debug(
-      {
-        userId,
-        activity: session.activityName,
-        sessionId: session.id,
-        endedAt,
-        durationSeconds,
-      },
-      "Finished activity session"
-    )
+    await saveActiveSessions(userId, nextSessions)
+  } finally {
+    await releaseLock(lockKey, lockToken)
   }
-
-  await saveActiveSessions(userId, nextSessions)
 }
