@@ -6,6 +6,7 @@ import {
   createActivitySession,
   createSession,
   finishActivitySession,
+  finishSessions,
   getActiveSessions,
   getActivityKey,
   getActivityStartTime,
@@ -69,13 +70,19 @@ export default async function trackPresence(
   }
 
   const user = await getTrackingUser(userId)
+  const previousSessions = await getActiveSessions(userId)
 
   if (!user.isTrackingEnabled || user.isBlacklisted) {
-    // TODO: finish and save active sessions if tracking is disabled mid-session
+    if (Object.keys(previousSessions).length > 0) {
+      const endedAt = Math.floor(Date.now() / 1000)
+
+      await finishSessions(previousSessions, endedAt)
+      await saveActiveSessions(userId, {})
+    }
+
     return
   }
 
-  const previousSessions = await getActiveSessions(userId)
   const nextSessions: ActiveActivitySessions = {}
 
   for (const activity of newPresence.activities) {

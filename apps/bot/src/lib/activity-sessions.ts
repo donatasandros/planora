@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto"
 import { activitySessionsTable, db, eq } from "@workspace/db"
 import { getJson, setJson } from "@workspace/redis"
 import { type Activity, ActivityType } from "discord.js"
+import { logger } from "./logger"
 
 const ACTIVE_SESSION_TTL_SECONDS = 60 * 60 * 24 * 7
 
@@ -117,5 +118,26 @@ export function createSession(
     applicationId: activity.applicationId ?? null,
     isCustom: isCustomActivity(activity),
     startedAt,
+  }
+}
+
+export async function finishSessions(
+  sessions: ActiveActivitySessions,
+  endedAt: number
+): Promise<void> {
+  for (const session of Object.values(sessions)) {
+    const duration = Math.max(0, endedAt - session.startedAt)
+
+    await finishActivitySession(session.id, endedAt, duration)
+
+    logger.debug(
+      {
+        activity: session.activityName,
+        sessionId: session.id,
+        endedAt,
+        duration,
+      },
+      "Finished activity session"
+    )
   }
 }
