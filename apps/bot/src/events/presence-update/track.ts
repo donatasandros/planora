@@ -70,7 +70,19 @@ export default async function trackPresence(
   }
 
   const user = await getTrackingUser(userId)
-  const previousSessions = await getActiveSessions(userId)
+
+  let previousSessions: ActiveActivitySessions = {}
+
+  try {
+    previousSessions = await getActiveSessions(userId)
+  } catch (err) {
+    logger.warn(
+      { err, userId },
+      "Skipping presence update due to active session state being unavailable"
+    )
+
+    return
+  }
 
   if (!user.isTrackingEnabled || user.isBlacklisted) {
     if (Object.keys(previousSessions).length > 0) {

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { activitySessionsTable, db, eq } from "@workspace/db"
-import { getJson, setJson } from "@workspace/redis"
+import { getJsonStrict, setJson } from "@workspace/redis"
 import { type Activity, ActivityType } from "discord.js"
 import { logger } from "./logger"
 
@@ -44,7 +44,9 @@ export async function getActiveSessions(
   userId: string
 ): Promise<ActiveActivitySessions> {
   return (
-    (await getJson<ActiveActivitySessions>(getActiveSessionsKey(userId))) ?? {}
+    (await getJsonStrict<ActiveActivitySessions>(
+      getActiveSessionsKey(userId)
+    )) ?? {}
   )
 }
 
