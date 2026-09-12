@@ -1,7 +1,7 @@
 import type { Client } from "discord.js"
 import { logger } from "@/lib/logger"
 
-const onLogin = (client: Client) => {
+export default function handleLogin(client: Client): void {
   logger.info(
     {
       tag: client.user?.tag,
@@ -11,5 +11,3 @@ const onLogin = (client: Client) => {
     "Bot client ready"
   )
 }
-
-export default onLogin

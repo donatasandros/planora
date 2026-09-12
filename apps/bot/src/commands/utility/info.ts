@@ -41,7 +41,7 @@ export async function execute(client: Client, interaction: CommandInteraction) {
         value:
           `• Memory: \`${systemInfo.process.memoryUsage}/${systemInfo.system.totalMemory} MB\`\u200b\u200b\n` +
           `• CPU Usage: \`${systemInfo.process.cpuUsage}%\`\n` +
-          `• Uptime: \`${formatTime(client.uptime ?? 0)}\`\n`,
+          `• Uptime: \`${formatTime(Math.floor((client.uptime ?? 0) / 1000))}\`\n`,
       },
       {
         name: "Latency",

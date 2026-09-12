@@ -17,7 +17,7 @@ export async function execute(client: Client, interaction: CommandInteraction) {
 
   const clientLatency = reply.createdTimestamp - interaction.createdTimestamp
   const websocketLatency = client.ws.ping
-  const botUptime = formatTime(client.uptime ?? 0)
+  const botUptime = formatTime(Math.floor((client.uptime ?? 0) / 1000))
 
   const embed = new EmbedBuilder()
     .setColor(0x8762e4)
