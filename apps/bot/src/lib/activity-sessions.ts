@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto"
 import { activitySessionsTable, db, eq } from "@workspace/db"
 import { getJsonStrict, setJson } from "@workspace/redis"
 import { type Activity, ActivityType } from "discord.js"
-import { logger } from "./logger"
+import { logger } from "@/lib/logger"
 
 const ACTIVE_SESSION_TTL_SECONDS = 60 * 60 * 24 * 7
 
