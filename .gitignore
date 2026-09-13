@@ -5,6 +5,7 @@ dist-ssr
 *.local
 .env
 .tanstack
+apps/web/src/routeTree.gen.ts
 .wrangler
 .output
 .vinxi
