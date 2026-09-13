@@ -1,37 +1,37 @@
 {
-  "name": "web",
-  "version": "0.0.1",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "dev": "vite dev --port 3000",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "biome lint .",
-    "format": "biome format --write .",
-    "check": "biome check --write .",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/react-devtools": "latest",
-    "@tanstack/react-router": "latest",
-    "@tanstack/react-router-devtools": "latest",
-    "@tanstack/react-start": "latest",
-    "@tanstack/router-plugin": "latest",
-    "@workspace/ui": "workspace:*",
-    "lucide-react": "^1.42.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "tailwindcss": "^4.3.3"
-  },
-  "devDependencies": {
-    "@tanstack/devtools-vite": "latest",
-    "@types/node": "^26.4.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
-    "typescript": "^7.0.2",
-    "vite": "^8.2.2"
-  }
+	"name": "web",
+	"version": "0.0.1",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"build": "vite build",
+		"check": "biome check --write .",
+		"dev": "vite dev --port 3000",
+		"format": "biome format --write .",
+		"lint": "biome lint .",
+		"preview": "vite preview",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@tailwindcss/vite": "^4.3.3",
+		"@tanstack/react-devtools": "latest",
+		"@tanstack/react-router": "latest",
+		"@tanstack/react-router-devtools": "latest",
+		"@tanstack/react-start": "latest",
+		"@tanstack/router-plugin": "latest",
+		"@workspace/ui": "workspace:*",
+		"lucide-react": "^1.42.0",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"tailwindcss": "^4.3.3"
+	},
+	"devDependencies": {
+		"@tanstack/devtools-vite": "latest",
+		"@types/node": "^26.4.1",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.7",
+		"@vitejs/plugin-react": "^6.1.1",
+		"typescript": "^7.0.2",
+		"vite": "^8.2.2"
+	}
 }

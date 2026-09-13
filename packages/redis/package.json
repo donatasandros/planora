@@ -1,24 +1,27 @@
 {
-  "name": "@workspace/redis",
-  "version": "0.0.0",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "lint": "biome lint .",
-    "format": "biome format --write .",
-    "check": "biome check --write .",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@workspace/logger": "workspace:*",
-    "ioredis": "^6.0.0"
-  },
-  "devDependencies": {
-    "@turbo/gen": "^2.10.12",
-    "@types/node": "^26.4.1",
-    "typescript": "^7.0.2"
-  },
-  "exports": {
-    ".": "./src/index.ts"
-  }
+	"name": "@workspace/redis",
+	"version": "0.0.0",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"build": "tsdown src/index.ts --format esm --clean",
+		"check": "biome check --write .",
+		"dev": "tsdown src/index.ts --format esm --dts --watch",
+		"format": "biome format --write .",
+		"lint": "biome lint .",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@workspace/logger": "workspace:*",
+		"ioredis": "^6.0.0"
+	},
+	"devDependencies": {
+		"@turbo/gen": "^2.10.12",
+		"@types/node": "^26.4.1",
+		"tsdown": "^0.23.0",
+		"typescript": "^7.0.2"
+	},
+	"exports": {
+		".": "./dist/index.mjs"
+	}
 }

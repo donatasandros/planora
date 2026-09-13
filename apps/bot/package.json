@@ -4,12 +4,12 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "tsx watch --env-file=.env src/index.ts",
 		"build": "tsdown \"src/**/*.ts\" --format esm --clean",
-		"start": "node --env-file=.env ./dist/index.mjs",
-		"lint": "biome lint .",
-		"format": "biome format --write .",
 		"check": "biome check --write .",
+		"dev": "tsx watch --env-file=.env src/index.ts",
+		"format": "biome format --write .",
+		"lint": "biome lint .",
+		"start": "node --env-file=.env ./dist/index.mjs",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
