@@ -4,7 +4,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "tsdown src/index.ts --format esm --clean",
+		"build": "tsdown src/index.ts --format esm --dts --clean",
 		"check": "biome check --write .",
 		"dev": "tsdown src/index.ts --format esm --dts --watch",
 		"format": "biome format --write .",
@@ -15,17 +15,23 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@libsql/client": "^0.18.0",
-		"drizzle-orm": "1.0.0-rc.4"
+		"@workspace/logger": "workspace:*",
+		"drizzle-orm": "1.0.0-rc.4",
+		"pg": "^8.23.0",
+		"pg-native": "^3.9.0"
 	},
 	"devDependencies": {
 		"@turbo/gen": "^2.10.12",
 		"@types/node": "^26.4.1",
+		"@types/pg": "^8.23.1",
 		"drizzle-kit": "1.0.0-rc.4",
 		"tsdown": "^0.23.0",
 		"typescript": "^7.0.2"
 	},
 	"exports": {
-		".": "./dist/index.mjs"
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
+		}
 	}
 }
