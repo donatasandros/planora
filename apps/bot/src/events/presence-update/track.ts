@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto"
-import { acquireLock, claim, releaseLock } from "@workspace/redis"
+import { acquireLock, claim, deleteKey, releaseLock } from "@workspace/redis"
 import type { Client, Presence } from "discord.js"
 import {
   type ActiveActivitySessions,
   createActivitySession,
   createSession,
   finishActivitySession,
-  finishSessions,
   getActiveSessions,
+  getActiveSessionsKey,
   getActivityKey,
   getActivityStartTime,
   saveActiveSessions,
@@ -81,13 +81,17 @@ export default async function trackPresence(
   try {
     const user = await getTrackingUser(userId)
     const previousSessions = await getActiveSessions(userId)
+    const activeSessionsKey = getActiveSessionsKey(userId)
+    const now = Math.floor(Date.now() / 1000)
 
     if (!user.isTrackingEnabled || user.isBlacklisted) {
       if (Object.keys(previousSessions).length > 0) {
-        const endedAt = Math.floor(Date.now() / 1000)
+        for (const session of Object.values(previousSessions)) {
+          const duration = Math.max(0, now - session.startedAt)
+          await finishActivitySession(session.id, now, duration)
+        }
 
-        await finishSessions(previousSessions, endedAt)
-        await saveActiveSessions(userId, {})
+        await deleteKey(activeSessionsKey)
       }
 
       return
@@ -100,7 +104,10 @@ export default async function trackPresence(
       const existingSession = previousSessions[activityKey]
 
       if (existingSession) {
-        nextSessions[activityKey] = existingSession
+        nextSessions[activityKey] = {
+          ...existingSession,
+          lastSeenAt: now,
+        }
         continue
       }
 
@@ -121,30 +128,32 @@ export default async function trackPresence(
       )
     }
 
-    const endedAt = Math.floor(Date.now() / 1000)
-
     for (const [activityKey, session] of Object.entries(previousSessions)) {
       if (nextSessions[activityKey]) {
         continue
       }
 
-      const durationSeconds = Math.max(0, endedAt - session.startedAt)
+      const durationSeconds = Math.max(0, now - session.startedAt)
 
-      await finishActivitySession(session.id, endedAt, durationSeconds)
+      await finishActivitySession(session.id, now, durationSeconds)
 
       logger.debug(
         {
           userId,
           activity: session.activityName,
           sessionId: session.id,
-          endedAt,
+          endedAt: now,
           durationSeconds,
         },
         "Finished activity session"
       )
     }
 
-    await saveActiveSessions(userId, nextSessions)
+    if (Object.keys(nextSessions).length > 0) {
+      await saveActiveSessions(userId, nextSessions)
+    } else {
+      await deleteKey(activeSessionsKey)
+    }
   } finally {
     await releaseLock(lockKey, lockToken)
   }

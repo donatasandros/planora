@@ -68,9 +68,9 @@ async function getCurrentActivities(
 
   const activeSessions = await getActiveSessions(userId)
 
-  return Object.values(activeSessions).map((activity) => ({
-    activityName: activity.activityName,
-    startedAt: activity.startedAt,
+  return Object.values(activeSessions).map((session) => ({
+    activityName: session.activityName,
+    startedAt: session.startedAt,
   }))
 }
 

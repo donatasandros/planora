@@ -2,7 +2,7 @@ import { env } from "@workspace/env"
 import { Client, IntentsBitField, Partials } from "discord.js"
 import eventHandler from "@/handlers/event-handler"
 import { logger } from "@/lib/logger"
-import { startActivityReconciliationWorker } from "@/workers/activity-reconciliation"
+import { startSessionSweeperWorker } from "@/workers/activity-session-sweeper"
 
 const client = new Client({
   intents: [
@@ -21,7 +21,7 @@ const client = new Client({
   ],
 })
 
-startActivityReconciliationWorker()
+startSessionSweeperWorker()
 
 ;(async () => {
   try {

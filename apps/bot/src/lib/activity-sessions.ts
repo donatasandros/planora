@@ -2,9 +2,8 @@ import { randomUUID } from "node:crypto"
 import { activitySessionsTable, db, eq } from "@workspace/db"
 import { getJsonStrict, setJson } from "@workspace/redis"
 import { type Activity, ActivityType } from "discord.js"
-import { logger } from "@/lib/logger"
 
-const ACTIVE_SESSION_TTL_SECONDS = 60 * 60 * 24 * 7
+const ACTIVE_SESSION_TTL_SECONDS = 7 * 24 * 60 * 60 // 7 days
 
 export type ActiveActivitySession = {
   id: string
@@ -14,11 +13,12 @@ export type ActiveActivitySession = {
   applicationId: string | null
   isCustom: boolean
   startedAt: number
+  lastSeenAt: number
 }
 
 export type ActiveActivitySessions = Record<string, ActiveActivitySession>
 
-function getActiveSessionsKey(userId: string): string {
+export function getActiveSessionsKey(userId: string): string {
   return `activity:active:${userId}`
 }
 
@@ -82,18 +82,6 @@ export async function createActivitySession(
     .onConflictDoNothing()
 }
 
-export async function updateActivitySessionDuration(
-  sessionId: string,
-  durationSeconds: number
-): Promise<void> {
-  await db
-    .update(activitySessionsTable)
-    .set({
-      durationSeconds: Math.max(0, durationSeconds),
-    })
-    .where(eq(activitySessionsTable.id, sessionId))
-}
-
 export async function finishActivitySession(
   sessionId: string,
   endedAt: number,
@@ -120,26 +108,6 @@ export function createSession(
     applicationId: activity.applicationId ?? null,
     isCustom: isCustomActivity(activity),
     startedAt,
-  }
-}
-
-export async function finishSessions(
-  sessions: ActiveActivitySessions,
-  endedAt: number
-): Promise<void> {
-  for (const session of Object.values(sessions)) {
-    const duration = Math.max(0, endedAt - session.startedAt)
-
-    await finishActivitySession(session.id, endedAt, duration)
-
-    logger.debug(
-      {
-        activity: session.activityName,
-        sessionId: session.id,
-        endedAt,
-        duration,
-      },
-      "Finished activity session"
-    )
+    lastSeenAt: Math.floor(Date.now() / 1000),
   }
 }
