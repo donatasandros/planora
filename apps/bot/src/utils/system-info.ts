@@ -12,11 +12,11 @@ type SystemInfo = {
   }
 }
 
-function bytesToMB(bytes: number) {
+function bytesToMB(bytes: number): number {
   return Number((bytes / 1024 / 1024).toFixed(1))
 }
 
-async function getProcessCpuUsage() {
+async function getProcessCpuUsage(): Promise<number> {
   const startUsage = process.cpuUsage()
   const startTime = process.hrtime.bigint()
 
