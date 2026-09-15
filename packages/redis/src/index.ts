@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto"
+import { env } from "@workspace/env"
 import { createChildLogger } from "@workspace/logger"
 import Redis from "ioredis"
 
@@ -6,12 +7,12 @@ const globalForRedis = globalThis as unknown as { redis?: Redis }
 
 export const redis =
   globalForRedis.redis ??
-  new Redis(process.env.REDIS_URL as string, {
+  new Redis(env.REDIS_URL, {
     maxRetriesPerRequest: 2,
     lazyConnect: true,
   })
 
-if (process.env.NODE_ENV !== "production") {
+if (env.NODE_ENV !== "production") {
   globalForRedis.redis = redis
 }
 

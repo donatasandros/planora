@@ -1,3 +1,4 @@
+import { env } from "@workspace/env"
 import { Client, IntentsBitField, Partials } from "discord.js"
 import eventHandler from "@/handlers/event-handler"
 import { logger } from "@/lib/logger"
@@ -25,7 +26,7 @@ startActivityReconciliationWorker()
 ;(async () => {
   try {
     await eventHandler(client)
-    await client.login(process.env.TOKEN)
+    await client.login(env.DISCORD_BOT_TOKEN)
   } catch (err) {
     logger.error({ err }, "Fatal error during bot startup")
   }

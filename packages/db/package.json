@@ -15,6 +15,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@workspace/env": "workspace:*",
 		"@workspace/logger": "workspace:*",
 		"drizzle-orm": "1.0.0-rc.4",
 		"pg": "^8.23.0",

@@ -14,6 +14,7 @@
 	},
 	"dependencies": {
 		"@workspace/db": "workspace:*",
+		"@workspace/env": "workspace:*",
 		"@workspace/logger": "workspace:*",
 		"@workspace/redis": "workspace:*",
 		"discord.js": "^14.27.0"

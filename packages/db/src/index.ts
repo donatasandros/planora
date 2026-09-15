@@ -1,3 +1,4 @@
+import { env } from "@workspace/env"
 import { createChildLogger } from "@workspace/logger"
 import { drizzle } from "drizzle-orm/node-postgres"
 import pg from "pg"
@@ -10,7 +11,7 @@ if (!native) {
 }
 
 const pool = new native.Pool({
-  connectionString: process.env.DATABASE_URL as string,
+  connectionString: env.DATABASE_URL,
   max: 10,
   connectionTimeoutMillis: 5_000,
   idleTimeoutMillis: 30_000,
