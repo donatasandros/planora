@@ -4,7 +4,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "tsdown src/index.ts --format esm --clean",
+		"build": "tsdown src/index.ts --format esm --dts --clean",
 		"check": "biome check --write .",
 		"dev": "tsdown src/index.ts --format esm --dts --watch",
 		"format": "biome format --write .",
