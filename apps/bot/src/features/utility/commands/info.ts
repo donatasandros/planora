@@ -5,6 +5,7 @@ import {
    SlashCommandBuilder,
 } from "discord.js"
 import { getSystemInfo } from "@/features/utility/utils/system-info"
+import { COLORS } from "@/shared/constants/colors"
 import { formatTime } from "@/shared/utils/time"
 
 export const data = new SlashCommandBuilder()
@@ -27,7 +28,7 @@ export async function execute(client: Client, interaction: CommandInteraction) {
    )
 
    const embed = new EmbedBuilder()
-      .setColor(0x8762e4)
+      .setColor(COLORS.primary)
       .setTitle("Bot Information")
       .addFields(
          {

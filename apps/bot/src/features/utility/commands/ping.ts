@@ -4,6 +4,7 @@ import {
    EmbedBuilder,
    SlashCommandBuilder,
 } from "discord.js"
+import { COLORS } from "@/shared/constants/colors"
 import { formatTime } from "@/shared/utils/time"
 
 export const data = new SlashCommandBuilder()
@@ -20,7 +21,7 @@ export async function execute(client: Client, interaction: CommandInteraction) {
    const botUptime = formatTime(Math.floor((client.uptime ?? 0) / 1000))
 
    const embed = new EmbedBuilder()
-      .setColor(0x8762e4)
+      .setColor(COLORS.primary)
       .setTitle("Pong!")
       .setDescription(
          `• Client latency: \`${clientLatency} ms\`\n` +
