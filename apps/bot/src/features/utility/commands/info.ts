@@ -55,10 +55,6 @@ export async function execute(client: Client, interaction: CommandInteraction) {
             value:
                `• Servers: \`${client.guilds.cache.size.toLocaleString()}\`\n` +
                `• Users: \`${totalUsers}\`\n\n`,
-         },
-         {
-            name: "Links",
-            value: `[• Dashboard](https://TODO.com)\n[• Support Server](https://TODO.com)`,
          }
       )
 
