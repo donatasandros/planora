@@ -1,15 +1,4 @@
 import {
-   activitySessionsTable,
-   and,
-   count,
-   db,
-   desc,
-   eq,
-   isNotNull,
-   lt,
-   or,
-} from "@workspace/db"
-import {
    type APIEmbed,
    type ChatInputCommandInteraction,
    type Client,
@@ -17,27 +6,10 @@ import {
    SlashCommandBuilder,
 } from "discord.js"
 import { logger } from "@/core/logger"
+import { activityService, type HistorySession } from "@/features/activity"
 import { COLORS } from "@/shared/constants/colors"
-import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
 import { formatActivityRow } from "@/shared/utils/formatting"
-import type { PaginationCursor } from "@/shared/utils/pagination"
 import paginate from "@/shared/utils/pagination"
-
-type HistorySession = {
-   id: string
-   activityName: string
-   activityKey: string
-   startedAt: number
-   endedAt: number | null
-   durationSeconds: number
-   isCustom: boolean
-}
-
-type HistoryPage = {
-   sessions: HistorySession[]
-   nextCursor: PaginationCursor | null
-   totalPages?: number
-}
 
 export const data = new SlashCommandBuilder()
    .setName("history")
@@ -48,78 +20,6 @@ export const data = new SlashCommandBuilder()
          .setDescription("The user whose activity history you want to view")
          .setRequired(false)
    )
-
-async function getHistoryPage(
-   userId: string,
-   cursor: PaginationCursor | null
-): Promise<HistoryPage> {
-   const userCondition = eq(activitySessionsTable.userId, userId)
-   const completedCondition = isNotNull(activitySessionsTable.endedAt)
-   const baseCondition = and(userCondition, completedCondition)
-
-   const cursorCondition = cursor
-      ? or(
-           lt(activitySessionsTable.startedAt, cursor.startedAt),
-           and(
-              eq(activitySessionsTable.startedAt, cursor.startedAt),
-              lt(activitySessionsTable.id, cursor.id)
-           )
-        )
-      : undefined
-
-   const whereCondition = cursorCondition
-      ? and(baseCondition, cursorCondition)
-      : baseCondition
-
-   let totalPages: number | undefined
-
-   if (!cursor) {
-      const [result] = await db
-         .select({
-            total: count(),
-         })
-         .from(activitySessionsTable)
-         .where(baseCondition)
-
-      const totalSessions = Number(result?.total ?? 0)
-
-      totalPages = Math.ceil(totalSessions / ITEMS_PER_PAGE)
-   }
-
-   const rows = await db
-      .select({
-         id: activitySessionsTable.id,
-         activityName: activitySessionsTable.activityName,
-         activityKey: activitySessionsTable.activityKey,
-         startedAt: activitySessionsTable.startedAt,
-         endedAt: activitySessionsTable.endedAt,
-         durationSeconds: activitySessionsTable.durationSeconds,
-         isCustom: activitySessionsTable.isCustom,
-      })
-      .from(activitySessionsTable)
-      .where(whereCondition)
-      .orderBy(
-         desc(activitySessionsTable.startedAt),
-         desc(activitySessionsTable.id)
-      )
-      .limit(ITEMS_PER_PAGE + 1)
-
-   const hasNextPage = rows.length > ITEMS_PER_PAGE
-   const sessions = rows.slice(0, ITEMS_PER_PAGE)
-   const lastSession = sessions.at(-1)
-
-   return {
-      sessions,
-      nextCursor:
-         hasNextPage && lastSession
-            ? {
-                 startedAt: lastSession.startedAt,
-                 id: lastSession.id,
-              }
-            : null,
-      totalPages,
-   }
-}
 
 function buildHistoryEmbed(
    username: string,
@@ -159,7 +59,10 @@ export async function execute(
          mode: "cursor",
          interaction,
          loadPage: async (cursor) => {
-            const page = await getHistoryPage(user.id, cursor)
+            const page = await activityService.getSessionHistoryPage(
+               user.id,
+               cursor
+            )
 
             return {
                items: page.sessions,

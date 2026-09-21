@@ -2,12 +2,15 @@ import { randomUUID } from "node:crypto"
 import {
    activitySessionsTable,
    and,
+   count,
    type DB,
    db,
    desc,
    eq,
    isNotNull,
+   lt,
    max,
+   or,
    sum,
 } from "@workspace/db"
 import { type RedisService, redisService } from "@workspace/redis"
@@ -21,8 +24,11 @@ import {
    type ActiveActivitySession,
    type ActiveActivitySessions,
    type CurrentActivity,
+   type HistoryPage,
    type PastActivity,
 } from "@/features/activity"
+import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
+import type { PaginationCursor } from "@/shared/utils/pagination"
 
 export class ActivityService {
    constructor(
@@ -173,6 +179,78 @@ export class ActivityService {
          isCustom: this.isCustomActivity(activity),
          startedAt,
          lastSeenAt: Math.floor(Date.now() / 1000),
+      }
+   }
+
+   public async getSessionHistoryPage(
+      userId: string,
+      cursor: PaginationCursor | null
+   ): Promise<HistoryPage> {
+      const userCondition = eq(activitySessionsTable.userId, userId)
+      const completedCondition = isNotNull(activitySessionsTable.endedAt)
+      const baseCondition = and(userCondition, completedCondition)
+
+      const cursorCondition = cursor
+         ? or(
+              lt(activitySessionsTable.startedAt, cursor.startedAt),
+              and(
+                 eq(activitySessionsTable.startedAt, cursor.startedAt),
+                 lt(activitySessionsTable.id, cursor.id)
+              )
+           )
+         : undefined
+
+      const whereCondition = cursorCondition
+         ? and(baseCondition, cursorCondition)
+         : baseCondition
+
+      let totalPages: number | undefined
+
+      if (!cursor) {
+         const [result] = await this.db
+            .select({
+               total: count(),
+            })
+            .from(activitySessionsTable)
+            .where(baseCondition)
+
+         const totalSessions = Number(result?.total ?? 0)
+
+         totalPages = Math.ceil(totalSessions / ITEMS_PER_PAGE)
+      }
+
+      const rows = await this.db
+         .select({
+            id: activitySessionsTable.id,
+            activityName: activitySessionsTable.activityName,
+            activityKey: activitySessionsTable.activityKey,
+            startedAt: activitySessionsTable.startedAt,
+            endedAt: activitySessionsTable.endedAt,
+            durationSeconds: activitySessionsTable.durationSeconds,
+            isCustom: activitySessionsTable.isCustom,
+         })
+         .from(activitySessionsTable)
+         .where(whereCondition)
+         .orderBy(
+            desc(activitySessionsTable.startedAt),
+            desc(activitySessionsTable.id)
+         )
+         .limit(ITEMS_PER_PAGE + 1)
+
+      const hasNextPage = rows.length > ITEMS_PER_PAGE
+      const sessions = rows.slice(0, ITEMS_PER_PAGE)
+      const lastSession = sessions.at(-1)
+
+      return {
+         sessions,
+         nextCursor:
+            hasNextPage && lastSession
+               ? {
+                    startedAt: lastSession.startedAt,
+                    id: lastSession.id,
+                 }
+               : null,
+         totalPages,
       }
    }
 }
