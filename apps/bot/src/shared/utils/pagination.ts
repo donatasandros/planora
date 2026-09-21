@@ -13,6 +13,7 @@ import {
    TextInputStyle,
 } from "discord.js"
 import { emojis } from "@/shared/constants/emojis"
+import { TIMEOUT_MS } from "@/shared/constants/pagination"
 
 export type PaginationCursor = {
    startedAt: number
@@ -67,7 +68,7 @@ async function paginateStatic({
    interaction,
    embeds,
    search,
-   time = 30 * 1000, // 30 seconds
+   time = TIMEOUT_MS,
 }: StaticPaginationParams) {
    if (embeds.length === 0) {
       throw new Error("Pagination required at least one page")
