@@ -5,7 +5,7 @@ import Redis from "ioredis"
 
 const globalForRedis = globalThis as unknown as { redis?: Redis }
 
-export const redis =
+const redisClient =
   globalForRedis.redis ??
   new Redis(env.REDIS_URL, {
     maxRetriesPerRequest: 2,
@@ -13,108 +13,111 @@ export const redis =
   })
 
 if (env.NODE_ENV !== "production") {
-  globalForRedis.redis = redis
+  globalForRedis.redis = redisClient
 }
 
-const logger = createChildLogger("redis")
+export class RedisService {
+  private logger = createChildLogger("redis")
 
-redis.on("error", (err) => {
-  logger.error({ err }, "Redis connection error")
-})
-
-export async function claim(key: string, ttlSeconds: number): Promise<boolean> {
-  try {
-    const result = await redis.set(key, "1", "EX", ttlSeconds, "NX")
-
-    return result === "OK"
-  } catch (err) {
-    logger.warn(
-      { err, key },
-      "Redis claim failed; continuing without deduplication"
-    )
-
-    return true
+  constructor(public readonly client: Redis) {
+    this.client.on("error", (err) => {
+      this.logger.error({ err }, "Redis connection error")
+    })
   }
-}
 
-export async function getJson<T>(key: string): Promise<T | null> {
-  try {
-    const value = await redis.get(key)
+  async claim(key: string, ttlSeconds: number): Promise<boolean> {
+    try {
+      const result = await this.client.set(key, "1", "EX", ttlSeconds, "NX")
+
+      return result === "OK"
+    } catch (err) {
+      this.logger.warn(
+        { err, key },
+        "Redis claim failed; continuing without deduplication"
+      )
+
+      return true
+    }
+  }
+
+  async getJson<T>(key: string): Promise<T | null> {
+    try {
+      const value = await this.client.get(key)
+
+      if (!value) {
+        return null
+      }
+
+      return JSON.parse(value) as T
+    } catch (err) {
+      this.logger.warn({ err, key }, "Redis JSON read failed")
+
+      return null
+    }
+  }
+
+  async getJsonStrict<T>(key: string): Promise<T | null> {
+    const value = await this.client.get(key)
 
     if (!value) {
       return null
     }
 
     return JSON.parse(value) as T
-  } catch (err) {
-    logger.warn({ err, key }, "Redis JSON read failed")
-
-    return null
-  }
-}
-
-export async function getJsonStrict<T>(key: string): Promise<T | null> {
-  const value = await redis.get(key)
-
-  if (!value) {
-    return null
   }
 
-  return JSON.parse(value) as T
-}
-
-export async function setJson(
-  key: string,
-  value: unknown,
-  ttlSeconds: number
-): Promise<void> {
-  try {
-    await redis.set(key, JSON.stringify(value), "EX", ttlSeconds)
-  } catch (err) {
-    logger.warn({ err, key }, "Redis JSON write failed")
+  async setJson(
+    key: string,
+    value: unknown,
+    ttlSeconds: number
+  ): Promise<void> {
+    try {
+      await this.client.set(key, JSON.stringify(value), "EX", ttlSeconds)
+    } catch (err) {
+      this.logger.warn({ err, key }, "Redis JSON write failed")
+    }
   }
-}
 
-export async function deleteKey(key: string): Promise<void> {
-  try {
-    await redis.del(key)
-  } catch (err) {
-    logger.warn({ err, key }, "Redis key deletion failed")
+  async deleteKey(key: string): Promise<void> {
+    try {
+      await this.client.del(key)
+    } catch (err) {
+      this.logger.warn({ err, key }, "Redis key deletion failed")
+    }
   }
-}
 
-export async function acquireLock(
-  key: string,
-  ttlSeconds: number
-): Promise<string | null> {
-  const token = randomUUID()
+  async acquireLock(key: string, ttlSeconds: number): Promise<string | null> {
+    const token = randomUUID()
 
-  try {
-    const result = await redis.set(key, token, "EX", ttlSeconds, "NX")
+    try {
+      const result = await this.client.set(key, token, "EX", ttlSeconds, "NX")
 
-    return result === "OK" ? token : null
-  } catch (err) {
-    logger.warn({ err, key }, "Failed to acquire Redis lock")
+      return result === "OK" ? token : null
+    } catch (err) {
+      this.logger.warn({ err, key }, "Failed to acquire Redis lock")
 
-    return null
+      return null
+    }
   }
-}
 
-export async function releaseLock(key: string, token: string): Promise<void> {
-  try {
-    await redis.eval(
-      `
+  async releaseLock(key: string, token: string): Promise<void> {
+    try {
+      await this.client.eval(
+        `
       	if redis.call("get", KEYS[1]) == ARGV[1] then
        		return redis.call("del", KEYS[1])
       	end
 
         return 0
       `,
-      1,
-      key,
-      token
-    )
-  } catch (err) {
-    logger.warn({ err, key }, "Failed to release Redis lock")
+        1,
+        key,
+        token
+      )
+    } catch (err) {
+      this.logger.warn({ err, key }, "Failed to release Redis lock")
+    }
   }
 }
+
+export const redisService = new RedisService(redisClient)

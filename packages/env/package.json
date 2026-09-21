@@ -13,7 +13,6 @@
 	},
 	"dependencies": {
 		"@t3-oss/env-core": "^0.13.11",
-		"@workspace/logger": "workspace:*",
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {

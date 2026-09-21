@@ -12,7 +12,7 @@
 		"enabled": true,
 		"indentStyle": "space",
 		"lineEnding": "lf",
-		"indentWidth": 2,
+		"indentWidth": 3,
 		"lineWidth": 80
 	},
 	"linter": {
@@ -38,7 +38,7 @@
 		"formatter": {
 			"quoteStyle": "double",
 			"semicolons": "asNeeded",
-			"trailingCommas":"es5"
+			"trailingCommas": "es5"
 		}
 	},
 	"css": {

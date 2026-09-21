@@ -23,6 +23,8 @@ pool.on("error", (err) => {
 
 export const db = drizzle({ client: pool })
 
+export type DB = typeof db
+
 export * from "drizzle-orm"
 
 export * from "./schema/index"
