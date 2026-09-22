@@ -1,20 +1,10 @@
 import path from "node:path"
 import { pathToFileURL } from "node:url"
-import {
-   type Client,
-   Collection,
-   type CommandInteraction,
-   Events,
-   type SlashCommandBuilder,
-} from "discord.js"
+import { type Client, Collection, Events } from "discord.js"
 import glob from "fast-glob"
 import { logger } from "@/core/logger"
+import type { CommandModule } from "@/core/types/discord.js"
 import { defineEvent } from "@/core/utils/define-event"
-
-export interface CommandModule {
-   data: SlashCommandBuilder
-   execute: (client: Client, interaction: CommandInteraction) => Promise<void>
-}
 
 export const clientReadyListeners = [
    defineEvent(Events.ClientReady, {
