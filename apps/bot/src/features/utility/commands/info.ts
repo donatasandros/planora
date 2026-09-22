@@ -1,6 +1,6 @@
 import {
+   type ChatInputCommandInteraction,
    type Client,
-   type CommandInteraction,
    EmbedBuilder,
    SlashCommandBuilder,
 } from "discord.js"
@@ -12,7 +12,10 @@ export const data = new SlashCommandBuilder()
    .setName("info")
    .setDescription("View bot performance, statistics, and system information.")
 
-export async function execute(client: Client, interaction: CommandInteraction) {
+export async function execute(
+   client: Client,
+   interaction: ChatInputCommandInteraction
+) {
    await interaction.deferReply()
 
    const reply = await interaction.fetchReply()

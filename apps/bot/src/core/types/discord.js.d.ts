@@ -1,7 +1,7 @@
 import type {
    Client as BaseClient,
+   ChatInputCommandInteraction,
    Collection,
-   CommandInteraction,
    SlashCommandBuilder,
 } from "discord.js"
 
@@ -9,7 +9,7 @@ export interface CommandModule {
    data: SlashCommandBuilder
    execute: (
       client: BaseClient,
-      interaction: CommandInteraction
+      interaction: ChatInputCommandInteraction
    ) => Promise<void>
 }
 
