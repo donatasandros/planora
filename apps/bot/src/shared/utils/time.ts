@@ -1,43 +1,44 @@
 type TimeUnit = "hours" | "minutes" | "seconds"
 
+const TIME_UNITS = [
+   {
+      key: "hours",
+      divisor: 3600,
+      label: "h",
+   },
+   {
+      key: "minutes",
+      divisor: 60,
+      label: "m",
+   },
+   {
+      key: "seconds",
+      divisor: 1,
+      label: "s",
+   },
+] as const
+
 export function formatTime(
    seconds: number,
    format: TimeUnit[] = ["hours", "minutes", "seconds"]
 ): string {
-   let remainingSeconds = Math.max(0, Math.floor(seconds))
-   let hasStarted = false
-   const parts: string[] = []
+   const units = TIME_UNITS.filter((unit) => format.includes(unit.key))
+   let remaining = Math.max(0, Math.floor(seconds))
 
-   if (format.includes("hours")) {
-      const h = Math.floor(remainingSeconds / 3600)
+   const values = units.map((unit) => {
+      const value = Math.floor(remaining / unit.divisor)
 
-      if (h > 0 || hasStarted) {
-         parts.push(`${h} h`)
-         hasStarted = true
-      }
+      remaining %= unit.divisor
 
-      remainingSeconds %= 3600
-   }
+      return { key: unit.key, value }
+   })
 
-   if (format.includes("minutes")) {
-      const m = Math.floor(remainingSeconds / 60)
+   const firstNonZero = values.findIndex((value) => value.value > 0)
+   const start = firstNonZero === -1 ? values.length - 1 : firstNonZero
 
-      if (m > 0 || hasStarted) {
-         parts.push(`${m} m`)
-         hasStarted = true
-      }
+   const parts = units
+      .slice(start)
+      .map((unit, i) => `${values[start + i].value} ${unit.label}`)
 
-      remainingSeconds %= 60
-   }
-
-   if (format.includes("seconds")) {
-      const s = remainingSeconds
-
-      if (s > 0 || hasStarted) {
-         parts.push(`${s} s`)
-         hasStarted = true
-      }
-   }
-
-   return parts.length > 0 ? parts.join(" ") : "0 s"
+   return parts.join(" ") || "0 s"
 }
