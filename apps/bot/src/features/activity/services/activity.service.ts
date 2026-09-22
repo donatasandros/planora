@@ -19,14 +19,14 @@ import {
    ActivityType,
    type ChatInputCommandInteraction,
 } from "discord.js"
-import {
-   ACTIVITY_REDIS_KEYS,
-   type ActiveActivitySession,
-   type ActiveActivitySessions,
-   type CurrentActivity,
-   type HistoryPage,
-   type PastActivity,
-} from "@/features/activity"
+import { ACTIVITY_REDIS_KEYS } from "@/features/activity/constants"
+import type {
+   ActiveActivitySession,
+   ActiveActivitySessions,
+   CurrentActivity,
+   HistoryPage,
+   PastActivity,
+} from "@/features/activity/types"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
 import type { PaginationCursor } from "@/shared/utils/pagination"
 

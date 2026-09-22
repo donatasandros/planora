@@ -6,11 +6,8 @@ import {
    SlashCommandBuilder,
 } from "discord.js"
 import { logger } from "@/core/logger"
-import {
-   activityService,
-   type CurrentActivity,
-   type PastActivity,
-} from "@/features/activity"
+import { activityService } from "@/features/activity/services/activity.service"
+import type { CurrentActivity, PastActivity } from "@/features/activity/types"
 import { COLORS } from "@/shared/constants/colors"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
 import { splitIntoChunks } from "@/shared/utils/array"

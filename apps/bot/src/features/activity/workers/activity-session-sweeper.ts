@@ -1,10 +1,8 @@
 import { redisService } from "@workspace/redis"
 import { logger } from "@/core/logger"
-import {
-   ACTIVITY_REDIS_KEYS,
-   type ActiveActivitySessions,
-   activityService,
-} from "@/features/activity"
+import { ACTIVITY_REDIS_KEYS } from "@/features/activity/constants"
+import { activityService } from "@/features/activity/services/activity.service"
+import type { ActiveActivitySessions } from "@/features/activity/types"
 
 const SWEEP_INTERVAL_MS = 3 * 60 * 1000 // 3 minutes
 const SWEEP_LOCK_TTL_SECONDS = 2 * 60 // 2 minutes

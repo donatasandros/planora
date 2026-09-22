@@ -1,4 +1,4 @@
-export type DiscordTimestampStyle = "t" | "T" | "d" | "D" | "f" | "F" | "R"
+type DiscordTimestampStyle = "t" | "T" | "d" | "D" | "f" | "F" | "R"
 
 export function discordTimestamp(
    timestampSeconds: number,

@@ -5,10 +5,10 @@ import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
 import {
    ACTIVITY_REDIS_KEYS,
-   type ActiveActivitySessions,
-   activityService,
    TRACK_CUSTOM_ACTIVITIES,
-} from "@/features/activity"
+} from "@/features/activity/constants"
+import { activityService } from "@/features/activity/services/activity.service"
+import type { ActiveActivitySessions } from "@/features/activity/types"
 import { userService } from "@/features/system"
 
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30

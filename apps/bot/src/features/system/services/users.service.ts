@@ -1,7 +1,8 @@
 import { botUsersTable, type DB, db, eq } from "@workspace/db"
 import { type RedisService, redisService } from "@workspace/redis"
 import { logger } from "@/core/logger"
-import { USER_REDIS_KEYS, type User } from "@/features/system"
+import { USER_REDIS_KEYS } from "@/features/system/constants"
+import type { User } from "@/features/system/types"
 
 export class UserService {
    constructor(

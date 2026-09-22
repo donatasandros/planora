@@ -6,7 +6,8 @@ import {
    SlashCommandBuilder,
 } from "discord.js"
 import { logger } from "@/core/logger"
-import { activityService, type HistorySession } from "@/features/activity"
+import { activityService } from "@/features/activity/services/activity.service"
+import type { HistorySession } from "@/features/activity/types"
 import { COLORS } from "@/shared/constants/colors"
 import { formatActivityRow } from "@/shared/utils/formatting"
 import paginate from "@/shared/utils/pagination"
