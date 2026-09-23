@@ -8,10 +8,10 @@ import {
 import { logger } from "@/core/logger"
 import { activityService } from "@/features/activity/services/activity.service"
 import type { CurrentActivity, PastActivity } from "@/features/activity/types"
+import { formatActivityRow } from "@/features/activity/utils/formatting"
 import { COLORS } from "@/shared/constants/colors"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
 import { splitIntoChunks } from "@/shared/utils/array"
-import { formatActivityRow } from "@/shared/utils/formatting"
 import paginate from "@/shared/utils/pagination"
 import { formatTime } from "@/shared/utils/time"
 
@@ -39,7 +39,9 @@ function buildActivityPages(
    )
 
    const currentActivityLines = currentActivities.map((activity) =>
-      formatActivityRow(activity.activityName, activity.startedAt)
+      formatActivityRow(activity.activityName, {
+         timestamp: activity.startedAt,
+      })
    )
 
    const firstPageLines: string[] = [
@@ -70,11 +72,10 @@ function buildActivityPages(
    if (firstPageActivities.length > 0) {
       firstPageLines.push(
          ...firstPageActivities.map((activity) =>
-            formatActivityRow(
-               activity.activityName,
-               activity.lastPlayed,
-               activity.timePlayed
-            )
+            formatActivityRow(activity.activityName, {
+               durationSeconds: activity.timePlayed,
+               timestamp: activity.lastPlayed,
+            })
          )
       )
    } else if (pastActivities.length === 0) {
@@ -108,11 +109,10 @@ function buildActivityPages(
             .setDescription(
                activityChunk
                   .map((activity) =>
-                     formatActivityRow(
-                        activity.activityName,
-                        activity.lastPlayed,
-                        activity.timePlayed
-                     )
+                     formatActivityRow(activity.activityName, {
+                        durationSeconds: activity.timePlayed,
+                        timestamp: activity.lastPlayed,
+                     })
                   )
                   .join("\n")
             )

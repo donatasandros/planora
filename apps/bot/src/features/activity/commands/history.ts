@@ -8,8 +8,8 @@ import {
 import { logger } from "@/core/logger"
 import { activityService } from "@/features/activity/services/activity.service"
 import type { HistorySession } from "@/features/activity/types"
+import { formatActivityRow } from "@/features/activity/utils/formatting"
 import { COLORS } from "@/shared/constants/colors"
-import { formatActivityRow } from "@/shared/utils/formatting"
 import paginate from "@/shared/utils/pagination"
 
 export const data = new SlashCommandBuilder()
@@ -34,11 +34,10 @@ function buildHistoryEmbed(
       .setDescription(
          sessions
             .map((session) =>
-               formatActivityRow(
-                  session.activityName,
-                  session.endedAt,
-                  session.durationSeconds
-               )
+               formatActivityRow(session.activityName, {
+                  durationSeconds: session.durationSeconds,
+                  timestamp: session.endedAt,
+               })
             )
             .join("\n")
       )
