@@ -1,20 +1,13 @@
-import path from "node:path"
-import { pathToFileURL } from "node:url"
 import { type Client, type ClientEvents, Events } from "discord.js"
-import glob from "fast-glob"
+import { loadFeatureModules } from "@/core/handlers/load-feature-modules"
 import { logger } from "@/core/logger"
 import type { FeatureEventListener } from "@/core/types/event"
 
 export default async function registerEvents(client: Client): Promise<void> {
-   const featuresDir = path.join(import.meta.dirname, "../../features")
-   const eventFiles = await glob("**/events/**/*.{js,mjs,ts}", {
-      cwd: featuresDir,
-   })
+   const modules = await loadFeatureModules("events")
    const eventRegistry = new Map<keyof ClientEvents, FeatureEventListener[]>()
 
-   for (const filePath of eventFiles) {
-      const fullPath = path.resolve(featuresDir, filePath)
-      const mod = await import(pathToFileURL(fullPath).href)
+   for (const { mod } of modules) {
       const exports = Object.values(mod).flat()
 
       for (const item of exports) {
@@ -65,7 +58,7 @@ export default async function registerEvents(client: Client): Promise<void> {
    }
 
    logger.info(
-      { totalEvents: eventRegistry.size, totalFiles: eventFiles.length },
+      { totalEvents: eventRegistry.size, totalFiles: modules.length },
       "Registered event handlers"
    )
 }

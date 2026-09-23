@@ -1,7 +1,5 @@
-import path from "node:path"
-import { pathToFileURL } from "node:url"
 import { type Client, Collection, Events } from "discord.js"
-import glob from "fast-glob"
+import { loadFeatureModules } from "@/core/handlers/load-feature-modules"
 import { logger } from "@/core/logger"
 import type { CommandModule } from "@/core/types/discord.js"
 import { defineEvent } from "@/core/utils/define-event"
@@ -12,16 +10,11 @@ export const clientReadyListeners = [
       async execute(client: Client) {
          client.commands = new Collection<string, CommandModule>()
 
-         const featuresDir = path.join(import.meta.dirname, "../..")
-         const commandFiles = await glob("**/commands/**/*.{js,mjs,ts}", {
-            cwd: featuresDir,
-         })
+         const modules = await loadFeatureModules("commands")
          let total = 0
 
-         for (const filePath of commandFiles) {
-            const fullPath = path.resolve(featuresDir, filePath)
-            const mod = await import(pathToFileURL(fullPath).href)
-            const command: Partial<CommandModule> = mod
+         for (const { mod, filePath } of modules) {
+            const command = mod as Partial<CommandModule>
 
             if (!command.data || typeof command.execute !== "function") {
                logger.warn(
