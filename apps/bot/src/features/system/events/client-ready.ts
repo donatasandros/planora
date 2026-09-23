@@ -21,7 +21,7 @@ export const clientReadyListeners = [
          for (const filePath of commandFiles) {
             const fullPath = path.resolve(featuresDir, filePath)
             const mod = await import(pathToFileURL(fullPath).href)
-            const command: Partial<CommandModule> = mod.default ?? mod
+            const command: Partial<CommandModule> = mod
 
             if (!command.data || typeof command.execute !== "function") {
                logger.warn(
