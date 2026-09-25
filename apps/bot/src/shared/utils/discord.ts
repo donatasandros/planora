@@ -1,8 +1,8 @@
 type DiscordTimestampStyle = "t" | "T" | "d" | "D" | "f" | "F" | "R"
 
 export function discordTimestamp(
-   timestampSeconds: number,
-   style: DiscordTimestampStyle = "R"
+	timestampSeconds: number,
+	style: DiscordTimestampStyle = "R"
 ): string {
-   return `<t:${timestampSeconds}:${style}>`
+	return `<t:${timestampSeconds}:${style}>`
 }

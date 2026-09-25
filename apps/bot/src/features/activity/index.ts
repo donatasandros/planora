@@ -1,3 +1,5 @@
 export * from "./constants"
-export * from "./services/activity.service"
+export * from "./services/history"
+export * from "./services/sessions"
 export * from "./types"
+export * from "./workers/activity-session-sweeper"

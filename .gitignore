@@ -12,6 +12,7 @@ apps/web/src/routeTree.gen.ts
 __unconfig*
 todos.json
 .zed
+TODO.md
 
 # turbo
 .turbo

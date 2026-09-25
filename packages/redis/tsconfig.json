@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "paths": {
-      "@workspace/redis/*": ["./src/*"]
-    },
-    "types": ["node"]
-  },
-  "include": ["."],
-  "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["ES2022"],
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"skipLibCheck": true,
+		"strict": true,
+		"noEmit": true,
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		"types": ["node"]
+	},
+	"include": ["."],
+	"exclude": ["node_modules", "dist"]
 }

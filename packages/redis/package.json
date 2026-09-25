@@ -23,6 +23,9 @@
 		"typescript": "^7.0.2"
 	},
 	"exports": {
-		".": "./dist/index.mjs"
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
+		}
 	}
 }

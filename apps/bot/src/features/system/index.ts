@@ -1,3 +1,3 @@
 export * from "./constants"
-export * from "./services/users.service"
+export * from "./services/users"
 export * from "./types"

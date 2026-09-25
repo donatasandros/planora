@@ -1,57 +1,57 @@
 import os from "node:os"
 
 type SystemInfo = {
-   process: {
-      cpuUsage: number
-      memoryUsage: number
-   }
-   system: {
-      platform: string
-      totalMemory: number
-      nodeVersion: string
-   }
+	process: {
+		cpuUsage: number
+		memoryUsage: number
+	}
+	system: {
+		platform: string
+		totalMemory: number
+		nodeVersion: string
+	}
 }
 
 function bytesToMB(bytes: number): number {
-   return Number((bytes / 1024 / 1024).toFixed(1))
+	return Number((bytes / 1024 / 1024).toFixed(1))
 }
 
 async function getProcessCpuUsage(): Promise<number> {
-   const startUsage = process.cpuUsage()
-   const startTime = process.hrtime.bigint()
+	const startUsage = process.cpuUsage()
+	const startTime = process.hrtime.bigint()
 
-   await new Promise((resolve) => setTimeout(resolve, 100))
+	await new Promise((resolve) => setTimeout(resolve, 100))
 
-   const elapUsage = process.cpuUsage(startUsage)
-   const elapTimeNs = process.hrtime.bigint() - startTime
-   const elapTimeUs = Number(elapTimeNs / 1000n)
+	const elapUsage = process.cpuUsage(startUsage)
+	const elapTimeNs = process.hrtime.bigint() - startTime
+	const elapTimeUs = Number(elapTimeNs / 1000n)
 
-   const elapUserUs = elapUsage.user
-   const elapSystemUs = elapUsage.system
-   const totalCpuUs = elapUserUs + elapSystemUs
+	const elapUserUs = elapUsage.user
+	const elapSystemUs = elapUsage.system
+	const totalCpuUs = elapUserUs + elapSystemUs
 
-   const cpuCount = os.cpus().length || 1
-   const cpuPercent = (100 * totalCpuUs) / (elapTimeUs * cpuCount)
+	const cpuCount = os.cpus().length || 1
+	const cpuPercent = (100 * totalCpuUs) / (elapTimeUs * cpuCount)
 
-   return Number(cpuPercent.toFixed(0))
+	return Number(cpuPercent.toFixed(0))
 }
 
 export async function getSystemInfo(): Promise<SystemInfo> {
-   const memoryUsage = process.memoryUsage().rss
+	const memoryUsage = process.memoryUsage().rss
 
-   const totalMem = os.totalmem()
+	const totalMem = os.totalmem()
 
-   const processCpuPercent = await getProcessCpuUsage()
+	const processCpuPercent = await getProcessCpuUsage()
 
-   return {
-      process: {
-         cpuUsage: processCpuPercent,
-         memoryUsage: bytesToMB(memoryUsage),
-      },
-      system: {
-         platform: `${os.type()} ${os.arch()}`,
-         totalMemory: bytesToMB(totalMem),
-         nodeVersion: process.version,
-      },
-   }
+	return {
+		process: {
+			cpuUsage: processCpuPercent,
+			memoryUsage: bytesToMB(memoryUsage),
+		},
+		system: {
+			platform: `${os.type()} ${os.arch()}`,
+			totalMemory: bytesToMB(totalMem),
+			nodeVersion: process.version,
+		},
+	}
 }

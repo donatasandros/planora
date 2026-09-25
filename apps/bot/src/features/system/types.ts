@@ -1,5 +1,6 @@
 export type User = {
-   id: string
-   isTrackingEnabled: boolean
-   isBlacklisted: boolean
+	id: string
+	isTrackingEnabled: boolean
+	isProfilePrivate: boolean
+	isBlacklisted: boolean
 }
