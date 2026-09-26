@@ -18,7 +18,7 @@ import {
 	getActiveSessionsKey,
 	getActivityKey,
 } from "@/features/activity/utils/activity"
-import { getUser } from "@/features/system"
+import { resolveUser } from "@/features/system"
 
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30
 const PRESENCE_DEDUPLICATION_TTL_SECONDS = 10
@@ -90,7 +90,18 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 		}
 
 		try {
-			const user = await getUser(userId)
+			const userResolution = await resolveUser(userId)
+
+			if (userResolution.kind === "unavailable") {
+				logger.warn(
+					{ userId },
+					"Skipping presence update, user state is unknown"
+				)
+
+				return
+			}
+
+			const user = userResolution.user
 			const previousSessions = await getActiveSessions(userId)
 			const activeSessionsKey = getActiveSessionsKey(userId)
 			const now = Math.floor(Date.now() / 1000)
