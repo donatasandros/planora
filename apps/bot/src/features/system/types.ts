@@ -16,3 +16,12 @@ export type UserResolution =
 	| { kind: "found"; user: User }
 	| { kind: "absent"; user: User }
 	| { kind: "unavailable" }
+
+export type ProfileVisibility =
+	| {
+			allowed: true
+	  }
+	| {
+			allowed: false
+			reason: "private" | "unavailable"
+	  }

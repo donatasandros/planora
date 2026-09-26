@@ -3,6 +3,7 @@ import {
 	type ChatInputCommandInteraction,
 	type Client,
 	EmbedBuilder,
+	MessageFlags,
 	SlashCommandBuilder,
 } from "discord.js"
 import { logger } from "@/core/logger"
@@ -10,6 +11,7 @@ import { getActivityTotals } from "@/features/activity/services/history"
 import { getCurrentActivities } from "@/features/activity/services/sessions"
 import type { ActivityTotal, CurrentActivity } from "@/features/activity/types"
 import { formatActivityRow } from "@/features/activity/utils/formatting"
+import { resolveProfileVisibility } from "@/features/system"
 import { COLORS } from "@/shared/constants/colors"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
 import { splitIntoChunks } from "@/shared/utils/array"
@@ -135,9 +137,23 @@ export async function execute(
 	_client: Client,
 	interaction: ChatInputCommandInteraction
 ) {
-	await interaction.deferReply()
-
 	const user = interaction.options.getUser("user") ?? interaction.user
+	const visibility = await resolveProfileVisibility(
+		interaction.user.id,
+		user.id
+	)
+
+	if (!visibility.allowed) {
+		return interaction.reply({
+			content:
+				visibility.reason === "private"
+					? `${user.username}'s profile is private.`
+					: "Could not verify access to this profile, please try again later.",
+			flags: MessageFlags.Ephemeral,
+		})
+	}
+
+	await interaction.deferReply()
 
 	try {
 		const [pastActivities, currentActivities] = await Promise.all([

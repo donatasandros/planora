@@ -13,7 +13,7 @@ if (!native) {
 const pool = new native.Pool({
 	connectionString: env.DATABASE_URL,
 	max: 10,
-	connectionTimeoutMillis: 5 * 1000,
+	connectionTimeoutMillis: 1.5 * 1000,
 	idleTimeoutMillis: 30 * 1000,
 })
 
