@@ -55,7 +55,10 @@ export async function execute(
 	const user = interaction.options.getUser("user") ?? interaction.user
 	const visibility = await resolveProfileVisibility(
 		interaction.user.id,
-		user.id
+		user.id,
+		{
+			isDirectMessage: interaction.guild === null,
+		}
 	)
 
 	if (!visibility.allowed) {
@@ -68,7 +71,9 @@ export async function execute(
 		})
 	}
 
-	await interaction.deferReply()
+	await interaction.deferReply({
+		flags: visibility.ephemeral ? MessageFlags.Ephemeral : undefined,
+	})
 
 	try {
 		await paginate<HistorySession>({

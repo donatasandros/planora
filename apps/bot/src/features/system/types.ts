@@ -20,6 +20,7 @@ export type UserResolution =
 export type ProfileVisibility =
 	| {
 			allowed: true
+			ephemeral: boolean
 	  }
 	| {
 			allowed: false

@@ -3,10 +3,15 @@ import type { ProfileVisibility } from "@/features/system/types"
 
 export async function resolveProfileVisibility(
 	viewerId: string,
-	targetId: string
+	targetId: string,
+	{
+		isDirectMessage,
+	}: {
+		isDirectMessage: boolean
+	}
 ): Promise<ProfileVisibility> {
-	if (viewerId === targetId) {
-		return { allowed: true }
+	if (isDirectMessage && viewerId === targetId) {
+		return { allowed: true, ephemeral: false }
 	}
 
 	const resolution = await resolveUser(targetId)
@@ -15,7 +20,14 @@ export async function resolveProfileVisibility(
 		return { allowed: false, reason: "unavailable" }
 	}
 
-	return resolution.user.isProfilePrivate
-		? { allowed: false, reason: "private" }
-		: { allowed: true }
+	if (!resolution.user.isProfilePrivate) {
+		return {
+			allowed: true,
+			ephemeral: false,
+		}
+	}
+
+	return viewerId === targetId
+		? { allowed: true, ephemeral: true }
+		: { allowed: false, reason: "private" }
 }
