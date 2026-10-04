@@ -13,6 +13,7 @@ import {
 	TextInputBuilder,
 	TextInputStyle,
 } from "discord.js"
+import { logger } from "@/core/logger"
 import { emojis } from "@/shared/constants/emojis"
 import { TIMEOUT_MS } from "@/shared/constants/pagination"
 
@@ -56,6 +57,26 @@ type CursorPaginationParams<T> = BasePaginationParams & {
 type PaginateParams<T = never> =
 	| StaticPaginationParams
 	| CursorPaginationParams<T>
+
+async function replyButtonError(
+	buttonInteraction: ButtonInteraction
+): Promise<void> {
+	try {
+		const content = "Something went wrong handling that button."
+
+		if (buttonInteraction.deferred || buttonInteraction.replied) {
+			await buttonInteraction.followUp({
+				content,
+				flags: MessageFlags.Ephemeral,
+			})
+		} else {
+			await buttonInteraction.reply({
+				content,
+				flags: MessageFlags.Ephemeral,
+			})
+		}
+	} catch {}
+}
 
 export default async function paginate<T>(params: PaginateParams<T>) {
 	if (params.mode === "cursor") {
@@ -250,31 +271,44 @@ async function paginateStatic({
 	})
 
 	collector.on("collect", async (buttonInteraction) => {
-		if (buttonInteraction.user.id !== interaction.user.id) {
-			await buttonInteraction.reply({
-				content: "Only the original user can interact with this button.",
-				flags: MessageFlags.Ephemeral,
-			})
+		try {
+			if (buttonInteraction.user.id !== interaction.user.id) {
+				await buttonInteraction.reply({
+					content: "Only the original user can interact with this button.",
+					flags: MessageFlags.Ephemeral,
+				})
 
-			return
-		}
-
-		collector.resetTimer()
-
-		if (buttonInteraction.customId === ids.search) {
-			const shouldRender = await handleSearch(buttonInteraction)
-
-			if (shouldRender) {
-				await render()
+				return
 			}
 
-			return
-		}
+			collector.resetTimer()
 
-		await buttonInteraction.deferUpdate()
+			if (buttonInteraction.customId === ids.search) {
+				const shouldRender = await handleSearch(buttonInteraction)
 
-		if (changePage(buttonInteraction.customId)) {
-			await render()
+				if (shouldRender) {
+					await render()
+				}
+
+				return
+			}
+
+			await buttonInteraction.deferUpdate()
+
+			if (changePage(buttonInteraction.customId)) {
+				await render()
+			}
+		} catch (err) {
+			logger.error(
+				{
+					err,
+					userId: buttonInteraction.user.id,
+					customId: buttonInteraction.customId,
+				},
+				"Pagination button handler failed"
+			)
+
+			await replyButtonError(buttonInteraction)
 		}
 	})
 
@@ -371,74 +405,87 @@ async function paginateCursor<T>({
 	})
 
 	collector.on("collect", async (buttonInteraction) => {
-		if (buttonInteraction.user.id !== interaction.user.id) {
-			await buttonInteraction.reply({
-				content: "Only the original user can interact with this button.",
-				flags: MessageFlags.Ephemeral,
-			})
+		try {
+			if (buttonInteraction.user.id !== interaction.user.id) {
+				await buttonInteraction.reply({
+					content: "Only the original user can interact with this button.",
+					flags: MessageFlags.Ephemeral,
+				})
 
-			return
-		}
-
-		if (loading) {
-			await buttonInteraction.deferUpdate()
-			return
-		}
-
-		collector.resetTimer()
-
-		if (buttonInteraction.customId === ids.previous) {
-			await buttonInteraction.deferUpdate()
-
-			if (index > 0) {
-				index -= 1
-				await render()
+				return
 			}
 
-			return
-		}
+			if (loading) {
+				await buttonInteraction.deferUpdate()
+				return
+			}
 
-		if (buttonInteraction.customId !== ids.next) {
+			collector.resetTimer()
+
+			if (buttonInteraction.customId === ids.previous) {
+				await buttonInteraction.deferUpdate()
+
+				if (index > 0) {
+					index -= 1
+					await render()
+				}
+
+				return
+			}
+
+			if (buttonInteraction.customId !== ids.next) {
+				await buttonInteraction.deferUpdate()
+				return
+			}
+
+			const currentPage = pages[index]
+
+			if (!currentPage.nextCursor) {
+				await buttonInteraction.deferUpdate()
+				return
+			}
+
 			await buttonInteraction.deferUpdate()
-			return
-		}
 
-		const currentPage = pages[index]
+			if (pages[index + 1]) {
+				index += 1
+				await render()
+				return
+			}
 
-		if (!currentPage.nextCursor) {
-			await buttonInteraction.deferUpdate()
-			return
-		}
+			loading = true
 
-		await buttonInteraction.deferUpdate()
+			try {
+				const nextPage = await loadPage(currentPage.nextCursor)
 
-		if (pages[index + 1]) {
-			index += 1
-			await render()
-			return
-		}
+				pages.push(nextPage)
+				index += 1
 
-		loading = true
+				await render()
+			} catch {
+				await message
+					.edit({
+						content: "Failed to load the next page.",
+						embeds: [],
+						components: [],
+					})
+					.catch(() => undefined)
 
-		try {
-			const nextPage = await loadPage(currentPage.nextCursor)
+				collector.stop("load-failed")
+			} finally {
+				loading = false
+			}
+		} catch (err) {
+			logger.error(
+				{
+					err,
+					userId: buttonInteraction.user.id,
+					customId: buttonInteraction.customId,
+				},
+				"Pagination button handler failed"
+			)
 
-			pages.push(nextPage)
-			index += 1
-
-			await render()
-		} catch {
-			await message
-				.edit({
-					content: "Failed to load the next page.",
-					embeds: [],
-					components: [],
-				})
-				.catch(() => undefined)
-
-			collector.stop("load-failed")
-		} finally {
-			loading = false
+			await replyButtonError(buttonInteraction)
 		}
 	})
 

@@ -32,6 +32,10 @@ client.on(Events.Error, (err) => {
 	logger.error({ err }, "Discord client error")
 })
 
+process.on("unhandledRejection", (reason) => {
+	logger.error({ reason }, "Unhandled promise rejection")
+})
+
 let sweeper: SessionSweeper | undefined
 let shutdownPromise: Promise<void> | undefined
 let shutdownTimer: NodeJS.Timeout | undefined
