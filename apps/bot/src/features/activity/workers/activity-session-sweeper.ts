@@ -18,9 +18,19 @@ import type {
 
 const SWEEP_INTERVAL_MS = 3 * 60 * 1000 // 3 minutes
 const SWEEP_LOCK_TTL_SECONDS = 2 * 60 // 2 minutes
+const SWEEP_USER_LOCK_TTL_SECONDS = 30
 
 const STALE_SESSION_SECONDS = 15 * 60 // 15 minutes
 const ACTIVE_SESSION_PATTERN = `${ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX}*`
+
+function hasStaleSessions(
+	sessions: ActiveActivitySessions,
+	now: number
+): boolean {
+	return Object.values(sessions).some(
+		(session) => now - session.lastSeenAt > STALE_SESSION_SECONDS
+	)
+}
 
 async function sweepStaleSessions(): Promise<void> {
 	const lockToken = await acquireLock(
@@ -33,65 +43,94 @@ async function sweepStaleSessions(): Promise<void> {
 	}
 
 	try {
-		const now = Math.floor(Date.now() / 1000)
-
 		for await (const keys of scanKeys(ACTIVE_SESSION_PATTERN, 100)) {
 			for (const key of keys) {
 				const userId = key.replace(
 					ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX,
 					""
 				)
-				const sessions = await getJson<ActiveActivitySessions>(key)
+				const userLockKey = ACTIVITY_REDIS_KEYS.USER_LOCK(userId)
 
-				if (!sessions) {
+				const snapshot = await getJson<ActiveActivitySessions>(key)
+
+				if (!snapshot) {
 					continue
 				}
 
-				const entries = Object.entries(sessions)
+				const now = Math.floor(Date.now() / 1000)
 
-				const staleEntries = entries.filter(
-					([_, session]) =>
-						now - session.lastSeenAt > STALE_SESSION_SECONDS
-				)
-
-				if (staleEntries.length === 0) {
+				if (!hasStaleSessions(snapshot, now)) {
 					continue
 				}
 
-				const activeEntries = entries.filter(
-					([_, session]) =>
-						now - session.lastSeenAt <= STALE_SESSION_SECONDS
+				const userLockToken = await acquireLock(
+					userLockKey,
+					SWEEP_USER_LOCK_TTL_SECONDS
 				)
 
-				for (const [_, session] of staleEntries) {
-					const duration = Math.max(
-						0,
-						session.lastSeenAt - session.startedAt
-					)
-
-					await finishActivitySession(
-						session.id,
-						session.lastSeenAt,
-						duration
-					)
-
+				if (!userLockToken) {
 					logger.debug(
-						{
-							userId,
-							sessionId: session.id,
-							activity: session.activityName,
-						},
-						"Sweep stale activity session"
+						{ userId },
+						"Skipped sweeping user because lock could not be acquired"
 					)
+					continue
 				}
 
-				if (activeEntries.length > 0) {
-					await setActiveSessions(
-						userId,
-						Object.fromEntries(activeEntries)
+				try {
+					const sessions = await getJson<ActiveActivitySessions>(key)
+
+					if (!sessions) {
+						continue
+					}
+
+					const entries = Object.entries(sessions)
+
+					const staleEntries = entries.filter(
+						([_, session]) =>
+							now - session.lastSeenAt > STALE_SESSION_SECONDS
 					)
-				} else {
-					await deleteKey(key)
+
+					if (staleEntries.length === 0) {
+						continue
+					}
+
+					const activeEntries = entries.filter(
+						([_, session]) =>
+							now - session.lastSeenAt <= STALE_SESSION_SECONDS
+					)
+
+					for (const [_, session] of staleEntries) {
+						const duration = Math.max(
+							0,
+							session.lastSeenAt - session.startedAt
+						)
+
+						await finishActivitySession(
+							session.id,
+							session.lastSeenAt,
+							duration
+						)
+
+						logger.debug(
+							{
+								userId,
+								sessionId: session.id,
+								activity: session.activityName,
+							},
+							"Sweep stale activity session"
+						)
+					}
+
+					if (activeEntries.length > 0) {
+						await setActiveSessions(
+							userId,
+							Object.fromEntries(activeEntries)
+						)
+					} else {
+						await deleteKey(key)
+					}
+				} finally {
+					await releaseLock(userLockKey, userLockToken)
 				}
 			}
 		}
