@@ -86,6 +86,9 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 				{ userId },
 				"Skipped presence update because user is locked"
 			)
+
+			await deleteKey(deduplicationKey)
+
 			return
 		}
 
