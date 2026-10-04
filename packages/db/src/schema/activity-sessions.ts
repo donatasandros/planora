@@ -1,3 +1,4 @@
+import { isNull } from "drizzle-orm"
 import {
 	bigint,
 	boolean,
@@ -6,6 +7,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 } from "drizzle-orm/pg-core"
 
 export const activitySessionsTable = pgTable(
@@ -43,5 +45,8 @@ export const activitySessionsTable = pgTable(
 			table.startedAt,
 			table.id
 		),
+		uniqueIndex("activity_sessions_open_user_activity_ux")
+			.on(table.userId, table.activityKey)
+			.where(isNull(table.endedAt)),
 	]
 )

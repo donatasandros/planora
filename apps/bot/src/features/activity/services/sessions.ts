@@ -1,6 +1,7 @@
-import { activitySessionsTable, db, eq } from "@workspace/db"
+import { activitySessionsTable, and, db, eq, isNull } from "@workspace/db"
 import { getJsonStrict, setJson } from "@workspace/redis"
 import type { Activity, ChatInputCommandInteraction } from "discord.js"
+import { logger } from "@/core/logger"
 import type {
 	ActiveActivitySession,
 	ActiveActivitySessions,
@@ -68,24 +69,66 @@ export async function startActivitySession(
 		getActivityStartTime(activity)
 	)
 
-	await db
-		.insert(activitySessionsTable)
-		.values({
-			id: session.id,
-			userId,
-			activityKey: session.activityKey,
-			activityName: session.activityName,
-			activityType: session.activityType,
-			applicationId: session.applicationId,
-			isCustom: session.isCustom,
-			startedAt: session.startedAt,
-			endedAt: null,
-			durationSeconds: 0,
-		})
-		.onConflictDoNothing()
+	for (let attempt = 0; attempt < 2; attempt++) {
+		const created = await db
+			.insert(activitySessionsTable)
+			.values({
+				id: session.id,
+				userId,
+				activityKey: session.activityKey,
+				activityName: session.activityName,
+				activityType: session.activityType,
+				applicationId: session.applicationId,
+				isCustom: session.isCustom,
+				startedAt: session.startedAt,
+				endedAt: null,
+				durationSeconds: 0,
+			})
+			.onConflictDoNothing()
+			.returning()
 
-	return session
+		if (created.length > 0) {
+			return session
+		}
+
+		logger.debug(
+			{ userId, activityKey: session.activityKey },
+			"Session insert conflicted; reusing open session"
+		)
+
+		const existing = await db
+			.select()
+			.from(activitySessionsTable)
+			.where(
+				and(
+					eq(activitySessionsTable.userId, userId),
+					eq(activitySessionsTable.activityKey, session.activityKey),
+					isNull(activitySessionsTable.endedAt)
+				)
+			)
+			.limit(1)
+
+		if (existing.length > 0) {
+			const row = existing[0]
+
+			return {
+				id: row.id,
+				activityKey: row.activityKey,
+				activityName: row.activityName,
+				activityType: row.activityType,
+				applicationId: row.applicationId,
+				isCustom: row.isCustom,
+				startedAt: row.startedAt,
+				lastSeenAt: Math.floor(Date.now() / 1000),
+			}
+		}
+	}
+
+	throw new Error(
+		`startActivitySession: no open session for user ${userId} after conflict`
+	)
 }
+
 export async function finishActivitySession(
 	sessionId: string,
 	endedAt: number,
