@@ -151,7 +151,9 @@ export async function execute(
 			content:
 				visibility.reason === "private"
 					? `${user.username}'s profile is private.`
-					: "Could not verify access to this profile, please try again later.",
+					: visibility.reason === "unavailable"
+						? "Could not verify access to this profile, please try again later."
+						: `${user.username}'s profile is not available.`,
 			flags: MessageFlags.Ephemeral,
 		})
 	}

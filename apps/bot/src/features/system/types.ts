@@ -24,5 +24,5 @@ export type ProfileVisibility =
 	  }
 	| {
 			allowed: false
-			reason: "private" | "unavailable"
+			reason: "private" | "unavailable" | "blacklisted" | "untracked"
 	  }

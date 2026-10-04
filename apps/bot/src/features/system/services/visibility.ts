@@ -10,17 +10,36 @@ export async function resolveProfileVisibility(
 		isDirectMessage: boolean
 	}
 ): Promise<ProfileVisibility> {
-	if (isDirectMessage && viewerId === targetId) {
-		return { allowed: true, ephemeral: false }
-	}
-
 	const resolution = await resolveUser(targetId)
 
 	if (resolution.kind === "unavailable") {
 		return { allowed: false, reason: "unavailable" }
 	}
 
-	if (!resolution.user.isProfilePrivate) {
+	const target = resolution.user
+
+	if (target.isBlacklisted) {
+		return {
+			allowed: false,
+			reason: "blacklisted",
+		}
+	}
+
+	if (!target.isTrackingEnabled && viewerId !== targetId) {
+		return {
+			allowed: false,
+			reason: "untracked",
+		}
+	}
+
+	if (isDirectMessage && viewerId === targetId) {
+		return {
+			allowed: true,
+			ephemeral: false,
+		}
+	}
+
+	if (!target.isProfilePrivate) {
 		return {
 			allowed: true,
 			ephemeral: false,
