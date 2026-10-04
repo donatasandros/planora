@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import {
 	ActionRowBuilder,
 	type APIEmbed,
@@ -78,31 +79,43 @@ async function paginateStatic({
 		return interaction.editReply({ embeds, components: [] })
 	}
 
+	const namespace = randomUUID()
+
+	const ids = {
+		first: `${namespace}:first`,
+		previous: `${namespace}:previous`,
+		search: `${namespace}:search`,
+		next: `${namespace}:next`,
+		last: `${namespace}:last`,
+		modal: `${namespace}:search-modal`,
+		input: `${namespace}:search-input`,
+	}
+
 	const buttons = {
 		first: new ButtonBuilder()
-			.setCustomId("first")
+			.setCustomId(ids.first)
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(true)
 			.setEmoji(emojis.pagination.first),
 
 		previous: new ButtonBuilder()
-			.setCustomId("previous")
+			.setCustomId(ids.previous)
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(true)
 			.setEmoji(emojis.pagination.previous),
 
 		search: new ButtonBuilder()
-			.setCustomId("search")
+			.setCustomId(ids.search)
 			.setStyle(ButtonStyle.Secondary)
 			.setEmoji(emojis.pagination.search),
 
 		next: new ButtonBuilder()
-			.setCustomId("next")
+			.setCustomId(ids.next)
 			.setStyle(ButtonStyle.Secondary)
 			.setEmoji(emojis.pagination.next),
 
 		last: new ButtonBuilder()
-			.setCustomId("last")
+			.setCustomId(ids.last)
 			.setStyle(ButtonStyle.Secondary)
 			.setEmoji(emojis.pagination.last),
 	}
@@ -136,19 +149,19 @@ async function paginateStatic({
 
 	function changePage(customId: string): boolean {
 		switch (customId) {
-			case "first":
+			case ids.first:
 				index = 0
 				break
 
-			case "previous":
+			case ids.previous:
 				index = Math.max(index - 1, 0)
 				break
 
-			case "next":
+			case ids.next:
 				index = Math.min(index + 1, embeds.length - 1)
 				break
 
-			case "last":
+			case ids.last:
 				index = embeds.length - 1
 				break
 
@@ -176,11 +189,11 @@ async function paginateStatic({
 		}
 
 		const modal = new ModalBuilder()
-			.setCustomId("pagination-search")
+			.setCustomId(ids.modal)
 			.setTitle(search.title)
 
 		const searchInput = new TextInputBuilder()
-			.setCustomId("search-query")
+			.setCustomId(ids.input)
 			.setStyle(TextInputStyle.Short)
 			.setPlaceholder(search.placeholder)
 			.setRequired(true)
@@ -196,7 +209,7 @@ async function paginateStatic({
 		const submitted = await buttonInteraction
 			.awaitModalSubmit({
 				filter: (modalInteraction) =>
-					modalInteraction.customId === "pagination-search" &&
+					modalInteraction.customId === ids.modal &&
 					modalInteraction.user.id === interaction.user.id,
 				time,
 			})
@@ -207,7 +220,7 @@ async function paginateStatic({
 		}
 
 		const query = submitted.fields
-			.getTextInputValue("search-query")
+			.getTextInputValue(ids.input)
 			.trim()
 			.toLowerCase()
 
@@ -248,7 +261,7 @@ async function paginateStatic({
 
 		collector.resetTimer()
 
-		if (buttonInteraction.customId === "search") {
+		if (buttonInteraction.customId === ids.search) {
 			const shouldRender = await handleSearch(buttonInteraction)
 
 			if (shouldRender) {
@@ -305,15 +318,22 @@ async function paginateCursor<T>({
 	let index = 0
 	let loading = false
 
+	const namespace = randomUUID()
+
+	const ids = {
+		previous: `${namespace}:previous`,
+		next: `${namespace}:next`,
+	}
+
 	const buttons = {
 		previous: new ButtonBuilder()
-			.setCustomId("cursor-previous")
+			.setCustomId(ids.previous)
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(true)
 			.setEmoji(emojis.pagination.previous),
 
 		next: new ButtonBuilder()
-			.setCustomId("cursor-next")
+			.setCustomId(ids.next)
 			.setStyle(ButtonStyle.Secondary)
 			.setDisabled(firstPage.nextCursor === null)
 			.setEmoji(emojis.pagination.next),
@@ -367,7 +387,7 @@ async function paginateCursor<T>({
 
 		collector.resetTimer()
 
-		if (buttonInteraction.customId === "cursor-previous") {
+		if (buttonInteraction.customId === ids.previous) {
 			await buttonInteraction.deferUpdate()
 
 			if (index > 0) {
@@ -378,7 +398,7 @@ async function paginateCursor<T>({
 			return
 		}
 
-		if (buttonInteraction.customId !== "cursor-next") {
+		if (buttonInteraction.customId !== ids.next) {
 			await buttonInteraction.deferUpdate()
 			return
 		}
