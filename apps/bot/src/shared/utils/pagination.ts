@@ -294,7 +294,7 @@ async function paginateCursor<T>({
 	loadPage,
 	renderPage,
 	emptyEmbed,
-	time = 30 * 1000, // 30 seconds
+	time = TIMEOUT_MS,
 }: CursorPaginationParams<T>) {
 	const firstPage = await loadPage(null)
 
