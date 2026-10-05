@@ -23,6 +23,11 @@ import { resolveUser } from "@/features/system"
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30
 const PRESENCE_DEDUPLICATION_TTL_SECONDS = 10
 
+const FINGERPRINT_MEMO_TTL_MS = 10 * 1000 // 10 seconds
+const FINGERPRINT_MEMO_MAX_ENTRIES = 50_000
+
+const fingerprintMemo = new Map<string, { hash: string; expiresAt: number }>()
+
 function getPresenceFingerprint(presence: Presence): string {
 	const activities = presence.activities
 		.map((activity) => ({
@@ -45,6 +50,37 @@ function hash(value: string): string {
 	return createHash("sha256").update(value).digest("hex")
 }
 
+function isMemoized(userId: string, hash: string): boolean {
+	const entry = fingerprintMemo.get(userId)
+
+	if (!entry) {
+		return false
+	}
+
+	if (entry.expiresAt <= Date.now() || entry.hash !== hash) {
+		fingerprintMemo.delete(userId)
+
+		return false
+	}
+
+	return true
+}
+
+function rememberFingerprint(userId: string, hash: string): void {
+	if (fingerprintMemo.size >= FINGERPRINT_MEMO_MAX_ENTRIES) {
+		const oldest = fingerprintMemo.keys().next()
+
+		if (!oldest.done) {
+			fingerprintMemo.delete(oldest.value)
+		}
+	}
+
+	fingerprintMemo.set(userId, {
+		hash,
+		expiresAt: Date.now() + FINGERPRINT_MEMO_TTL_MS,
+	})
+}
+
 export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 	priority: 50,
 	async execute(_client, _oldPresence, newPresence) {
@@ -59,12 +95,15 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 		}
 
 		const fingerprint = getPresenceFingerprint(newPresence)
+		const fingerprintHash = hash(fingerprint)
 
-		const deduplicationKey = [
-			"presence:event",
-			userId,
-			hash(fingerprint),
-		].join(":")
+		const deduplicationKey = ["presence:event", userId, fingerprintHash].join(
+			":"
+		)
+
+		if (isMemoized(userId, fingerprintHash)) {
+			return
+		}
 
 		const shouldProcess = await claim(
 			deduplicationKey,
@@ -120,6 +159,8 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 
 					await deleteKey(activeSessionsKey)
 				}
+
+				rememberFingerprint(userId, fingerprintHash)
 
 				return
 			}
@@ -188,6 +229,8 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 			} else {
 				await deleteKey(activeSessionsKey)
 			}
+
+			rememberFingerprint(userId, fingerprintHash)
 		} finally {
 			await releaseLock(lockKey, lockToken)
 		}
