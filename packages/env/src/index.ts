@@ -6,7 +6,7 @@ export const env = createEnv({
 		DATABASE_URL: z.url(),
 		DATABASE_POOL_MAX: z.coerce.number().int().min(1).default(10),
 		REDIS_URL: z.url(),
-		DISCORD_BOT_TOKEN: z.string(),
+		DISCORD_BOT_TOKEN: z.string().trim().min(1),
 		LOG_LEVEL: z
 			.enum(["fatal", "error", "warn", "info", "debug", "trace"])
 			.default("info"),
