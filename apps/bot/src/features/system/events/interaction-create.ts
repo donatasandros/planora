@@ -1,6 +1,7 @@
-import { Events, MessageFlags } from "discord.js"
+import { Events } from "discord.js"
 import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
+import { replyInteractionError } from "@/shared/utils/interaction"
 
 export const interactionCreateListeners = [
 	defineEvent(Events.InteractionCreate, {
@@ -52,17 +53,7 @@ export const interactionCreateListeners = [
 					"Command execution failed"
 				)
 
-				if (interaction.replied || interaction.deferred) {
-					await interaction.followUp({
-						content: "There was an error running this command!",
-						flags: MessageFlags.Ephemeral,
-					})
-				} else {
-					await interaction.reply({
-						content: "There was an error running this command!",
-						flags: MessageFlags.Ephemeral,
-					})
-				}
+				await replyInteractionError(interaction)
 			}
 		},
 	}),

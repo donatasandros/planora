@@ -16,6 +16,7 @@ import {
 import { logger } from "@/core/logger"
 import { emojis } from "@/shared/constants/emojis"
 import { TIMEOUT_MS } from "@/shared/constants/pagination"
+import { replyInteractionError } from "./interaction"
 
 export type PaginationCursor = {
 	startedAt: number
@@ -57,26 +58,6 @@ type CursorPaginationParams<T> = BasePaginationParams & {
 type PaginateParams<T = never> =
 	| StaticPaginationParams
 	| CursorPaginationParams<T>
-
-async function replyButtonError(
-	buttonInteraction: ButtonInteraction
-): Promise<void> {
-	try {
-		const content = "Something went wrong handling that button."
-
-		if (buttonInteraction.deferred || buttonInteraction.replied) {
-			await buttonInteraction.followUp({
-				content,
-				flags: MessageFlags.Ephemeral,
-			})
-		} else {
-			await buttonInteraction.reply({
-				content,
-				flags: MessageFlags.Ephemeral,
-			})
-		}
-	} catch {}
-}
 
 export default async function paginate<T>(params: PaginateParams<T>) {
 	if (params.mode === "cursor") {
@@ -308,7 +289,7 @@ async function paginateStatic({
 				"Pagination button handler failed"
 			)
 
-			await replyButtonError(buttonInteraction)
+			await replyInteractionError(buttonInteraction)
 		}
 	})
 
@@ -485,7 +466,7 @@ async function paginateCursor<T>({
 				"Pagination button handler failed"
 			)
 
-			await replyButtonError(buttonInteraction)
+			await replyInteractionError(buttonInteraction)
 		}
 	})
 
