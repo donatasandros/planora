@@ -93,7 +93,10 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 		}
 
 		try {
-			const userResolution = await resolveUser(userId)
+			const [userResolution, previousSessions] = await Promise.all([
+				resolveUser(userId),
+				getActiveSessions(userId),
+			])
 
 			if (userResolution.kind === "unavailable") {
 				logger.warn(
@@ -105,7 +108,6 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 			}
 
 			const user = userResolution.user
-			const previousSessions = await getActiveSessions(userId)
 			const activeSessionsKey = getActiveSessionsKey(userId)
 			const now = Math.floor(Date.now() / 1000)
 
