@@ -6,7 +6,6 @@
 		"paths": {
 			"@/*": ["./src/*"]
 		},
-		"typeRoots": ["./src/core/types", "./node_modules/@types"],
 		"rootDir": "./src",
 		"outDir": "./dist",
 		"resolveJsonModule": true,
