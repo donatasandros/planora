@@ -1,4 +1,9 @@
-import { activitySessionsTable, db, eq, sql } from "@workspace/db"
+import {
+	activitySessionsTable,
+	activityTotalsTable,
+	db,
+	sql,
+} from "@workspace/db"
 import { logger } from "@/core/logger"
 import type {
 	FinishOperation,
@@ -43,10 +48,20 @@ async function flushFinishes(ops: FinishOperation[]): Promise<void> {
 	)
 
 	await db.execute(sql`
-		UPDATE ${activitySessionsTable} AS s
-		SET ended_at = v.ended_at, duration_seconds = v.duration_seconds
-		FROM (VALUES ${sql.join(assignments, sql`, `)}) AS v(id, ended_at, duration_seconds)
-		WHERE s.id = v.id
+		WITH updated AS (
+			UPDATE ${activitySessionsTable} AS s
+			SET ended_at = v.ended_at, duration_seconds = v.duration_seconds
+			FROM (VALUES ${sql.join(assignments, sql`, `)}) AS v(id, ended_at, duration_seconds)
+			WHERE s.id = v.id AND s.ended_at IS NULL
+			RETURNING s.user_id, s.activity_key, s.activity_name, s.activity_type, s.application_id, v.duration_seconds, v.ended_at
+		)
+		INSERT INTO ${activityTotalsTable} (user_id, activity_key, activity_name, activity_type, application_id, total_seconds, session_count, last_played)
+		SELECT user_id, activity_key, activity_name, activity_type, application_id, duration_seconds, 1, ended_at FROM updated
+		ON CONFLICT (user_id, activity_key) DO UPDATE SET
+			total_seconds = ${activityTotalsTable}.total_seconds + EXCLUDED.total_seconds,
+			session_count = ${activityTotalsTable}.session_count + 1,
+			last_played = GREATEST(COALESCE(${activityTotalsTable}.last_played, 0), EXCLUDED.last_played),
+			activity_name = EXCLUDED.activity_name
 	`)
 }
 
@@ -63,10 +78,7 @@ async function flushSingle(op: PendingOperation): Promise<void> {
 		return
 	}
 
-	await db
-		.update(activitySessionsTable)
-		.set({ endedAt: op.endedAt, durationSeconds: op.durationSeconds })
-		.where(eq(activitySessionsTable.id, op.id))
+	await flushFinishes([op])
 
 	op.resolve()
 }

@@ -1,5 +1,6 @@
 import {
 	activitySessionsTable,
+	activityTotalsTable,
 	and,
 	count,
 	db,
@@ -7,9 +8,7 @@ import {
 	eq,
 	isNotNull,
 	lt,
-	max,
 	or,
-	sum,
 } from "@workspace/db"
 import type { ActivityTotal, HistoryPage } from "@/features/activity/types"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
@@ -18,23 +17,15 @@ import type { PaginationCursor } from "@/shared/utils/pagination"
 export async function getActivityTotals(
 	userId: string
 ): Promise<ActivityTotal[]> {
-	const totalDuration = sum(activitySessionsTable.durationSeconds)
-
 	return db
 		.select({
-			activityName: activitySessionsTable.activityName,
-			timePlayed: totalDuration.mapWith(Number),
-			lastPlayed: max(activitySessionsTable.endedAt),
+			activityName: activityTotalsTable.activityName,
+			timePlayed: activityTotalsTable.totalSeconds,
+			lastPlayed: activityTotalsTable.lastPlayed,
 		})
-		.from(activitySessionsTable)
-		.where(
-			and(
-				eq(activitySessionsTable.userId, userId),
-				isNotNull(activitySessionsTable.endedAt)
-			)
-		)
-		.groupBy(activitySessionsTable.activityName)
-		.orderBy(desc(totalDuration))
+		.from(activityTotalsTable)
+		.where(eq(activityTotalsTable.userId, userId))
+		.orderBy(desc(activityTotalsTable.totalSeconds))
 }
 
 export async function getActivityHistoryPage(
