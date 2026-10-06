@@ -2,6 +2,10 @@ import { activitySessionsTable, and, db, eq, isNull } from "@workspace/db"
 import { getJsonStrict, setJson } from "@workspace/redis"
 import type { Activity, ChatInputCommandInteraction } from "discord.js"
 import { logger } from "@/core/logger"
+import {
+	enqueueSessionFinish,
+	enqueueSessionStart,
+} from "@/features/activity/services/session-batch"
 import type {
 	ActiveActivitySession,
 	ActiveActivitySessions,
@@ -69,58 +73,52 @@ export async function startActivitySession(
 		getActivityStartTime(activity)
 	)
 
-	for (let attempt = 0; attempt < 2; attempt++) {
-		const created = await db
-			.insert(activitySessionsTable)
-			.values({
-				id: session.id,
-				userId,
-				activityKey: session.activityKey,
-				activityName: session.activityName,
-				activityType: session.activityType,
-				applicationId: session.applicationId,
-				isCustom: session.isCustom,
-				startedAt: session.startedAt,
-				endedAt: null,
-				durationSeconds: 0,
-			})
-			.onConflictDoNothing()
-			.returning()
+	const inserted = await enqueueSessionStart({
+		id: session.id,
+		userId,
+		activityKey: session.activityKey,
+		activityName: session.activityName,
+		activityType: session.activityType,
+		applicationId: session.applicationId,
+		isCustom: session.isCustom,
+		startedAt: session.startedAt,
+		endedAt: null,
+		durationSeconds: 0,
+	})
 
-		if (created.length > 0) {
-			return session
-		}
+	if (inserted) {
+		return session
+	}
 
-		logger.debug(
-			{ userId, activityKey: session.activityKey },
-			"Session insert conflicted; reusing open session"
-		)
+	logger.debug(
+		{ userId, activityKey: session.activityKey },
+		"Session insert conflicted; reusing open session"
+	)
 
-		const existing = await db
-			.select()
-			.from(activitySessionsTable)
-			.where(
-				and(
-					eq(activitySessionsTable.userId, userId),
-					eq(activitySessionsTable.activityKey, session.activityKey),
-					isNull(activitySessionsTable.endedAt)
-				)
+	const existing = await db
+		.select()
+		.from(activitySessionsTable)
+		.where(
+			and(
+				eq(activitySessionsTable.userId, userId),
+				eq(activitySessionsTable.activityKey, session.activityKey),
+				isNull(activitySessionsTable.endedAt)
 			)
-			.limit(1)
+		)
+		.limit(1)
 
-		if (existing.length > 0) {
-			const row = existing[0]
+	if (existing.length > 0) {
+		const row = existing[0]
 
-			return {
-				id: row.id,
-				activityKey: row.activityKey,
-				activityName: row.activityName,
-				activityType: row.activityType,
-				applicationId: row.applicationId,
-				isCustom: row.isCustom,
-				startedAt: row.startedAt,
-				lastSeenAt: Math.floor(Date.now() / 1000),
-			}
+		return {
+			id: row.id,
+			activityKey: row.activityKey,
+			activityName: row.activityName,
+			activityType: row.activityType,
+			applicationId: row.applicationId,
+			isCustom: row.isCustom,
+			startedAt: row.startedAt,
+			lastSeenAt: Math.floor(Date.now() / 1000),
 		}
 	}
 
@@ -134,11 +132,5 @@ export async function finishActivitySession(
 	endedAt: number,
 	durationSeconds: number
 ): Promise<void> {
-	await db
-		.update(activitySessionsTable)
-		.set({
-			endedAt,
-			durationSeconds: Math.max(0, durationSeconds),
-		})
-		.where(eq(activitySessionsTable.id, sessionId))
+	await enqueueSessionFinish(sessionId, endedAt, Math.max(0, durationSeconds))
 }

@@ -8,6 +8,7 @@ import {
 	type SessionSweeper,
 	startSessionSweeperWorker,
 } from "@/features/activity"
+import { stopSessionBatch } from "@/features/activity/services/session-batch"
 
 const SHUTDOWN_TIMEOUT_MS = 10 * 1000
 
@@ -66,6 +67,8 @@ function shutdown(reason: string, exitCode: number = 0): Promise<void> {
 			logger.info({ reason }, "Shutting down bot")
 
 			await sweeper?.stop()
+
+			await stopSessionBatch()
 
 			const results = await Promise.allSettled([
 				client.destroy(),

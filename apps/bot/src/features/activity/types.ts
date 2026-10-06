@@ -1,3 +1,4 @@
+import type { activitySessionsTable } from "@workspace/db"
 import type { PaginationCursor } from "@/shared/utils/pagination"
 
 export type ActiveActivitySession = {
@@ -43,3 +44,23 @@ export type HistoryPage = {
 export type SessionSweeper = {
 	stop: () => Promise<void>
 }
+
+export type SessionStartRow = typeof activitySessionsTable.$inferInsert
+
+export type StartOperation = {
+	kind: "start"
+	row: SessionStartRow
+	resolve: (inserted: boolean) => void
+	reject: (err: unknown) => void
+}
+
+export type FinishOperation = {
+	kind: "finish"
+	id: string
+	endedAt: number
+	durationSeconds: number
+	resolve: () => void
+	reject: (err: unknown) => void
+}
+
+export type PendingOperation = StartOperation | FinishOperation
