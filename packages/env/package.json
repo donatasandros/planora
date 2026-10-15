@@ -4,9 +4,9 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "tsdown src/index.ts --format esm --dts --clean",
+		"build": "tsdown \"src/**/*.ts\" --format esm --dts --clean",
 		"check": "biome check --write .",
-		"dev": "tsdown src/index.ts --format esm --dts --watch",
+		"dev": "tsdown \"src/**/*.ts\" --format esm --dts --watch",
 		"format": "biome format --write .",
 		"lint": "biome lint .",
 		"typecheck": "tsc --noEmit"
@@ -25,6 +25,10 @@
 		".": {
 			"types": "./dist/index.d.mts",
 			"import": "./dist/index.mjs"
+		},
+		"./db": {
+			"types": "./dist/db.d.mts",
+			"import": "./dist/db.mjs"
 		}
 	}
 }

@@ -9,7 +9,7 @@
 		"dev": "tsx watch --env-file=.env src/index.ts",
 		"format": "biome format --write .",
 		"lint": "biome lint .",
-		"start": "node --env-file=.env ./dist/index.mjs",
+		"start": "node ./dist/index.mjs",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {

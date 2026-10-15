@@ -1,4 +1,4 @@
-import { env } from "@workspace/env"
+import { env } from "@workspace/env/db"
 import { createChildLogger } from "@workspace/logger"
 import { drizzle } from "drizzle-orm/node-postgres"
 import pg from "pg"

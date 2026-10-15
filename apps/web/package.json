@@ -6,10 +6,10 @@
 	"scripts": {
 		"build": "vite build",
 		"check": "biome check --write .",
-		"dev": "vite dev --port 3000",
+		"dev": "vite dev",
 		"format": "biome format --write .",
 		"lint": "biome lint .",
-		"preview": "vite preview",
+		"start": "node dist/server/index.mjs",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
@@ -21,6 +21,7 @@
 		"@tanstack/router-plugin": "latest",
 		"@workspace/ui": "workspace:*",
 		"lucide-react": "^1.42.0",
+		"nitro": "3.0.260903-beta",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"tailwindcss": "^4.3.3"

@@ -1,0 +1,52 @@
+name: planora
+
+services:
+   web:
+      container_name: planora-web
+      build:
+         context: .
+         dockerfile: ./apps/web/Dockerfile
+      restart: unless-stopped
+      env_file:
+         - .env
+      environment:
+         NODE_ENV: production
+         PORT: ${PORT:-3000}
+      ports:
+         - ${PORT:-3000}:3000
+
+   bot:
+      container_name: planora-bot
+      build:
+         context: .
+         dockerfile: ./apps/bot/Dockerfile
+      restart: unless-stopped
+      env_file:
+         - .env
+      environment:
+         NODE_ENV: production
+         LOG_LEVEL: ${LOG_LEVEL}
+         DATABASE_URL: ${DATABASE_URL:?}
+         REDIS_URL: ${REDIS_URL:?}
+         DATABASE_POOL_MAX: ${DATABASE_POOL_MAX}
+         DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:?}
+
+   promtail:
+      image: grafana/promtail:latest
+      container_name: planora-promtail
+      restart: unless-stopped
+      command:
+         - -config.file=/etc/promtail/promtail-config.yaml
+         - -config.expand-env=true
+      env_file:
+         - .env
+      environment:
+         LOKI_URL: ${LOKI_URL:?}
+      volumes:
+         - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
+         - /var/lib/docker/containers:/var/lib/docker/containers:ro
+         - /var/run/docker.sock:/var/run/docker.sock:ro
+         - promtail-data:/tmp/promtail
+
+volumes:
+   promtail-data:
