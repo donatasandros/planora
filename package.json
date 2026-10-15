@@ -8,7 +8,8 @@
 		"dev": "turbo dev",
 		"format": "turbo format",
 		"lint": "turbo lint",
-		"typecheck": "turbo typecheck"
+		"typecheck": "turbo typecheck",
+		"test": "turbo test"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.12",

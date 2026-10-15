@@ -4,13 +4,14 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "tsdown \"src/**/*.ts\" --format esm --clean",
+		"build": "tsdown",
 		"check": "biome check --write .",
 		"dev": "tsx watch --env-file=.env src/index.ts",
 		"format": "biome format --write .",
 		"lint": "biome lint .",
 		"start": "node ./dist/index.mjs",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@workspace/db": "workspace:*",
@@ -25,6 +26,7 @@
 		"ts-node": "^10.9.2",
 		"tsdown": "^0.23.0",
 		"tsx": "^4.23.13",
-		"typescript": "^7.0.2"
+		"typescript": "^7.0.2",
+		"vitest": "^5.0.4"
 	}
 }
