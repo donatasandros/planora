@@ -1,0 +1,5 @@
+process.env.NODE_ENV = "test"
+process.env.LOG_LEVEL = "fatal"
+process.env.DATABASE_URL ??= "postgres://test:test@localhost:5432/planora_test"
+process.env.REDIS_URL ??= "redis://localhost:6379"
+process.env.DISCORD_BOT_TOKEN ??= "test-token"
