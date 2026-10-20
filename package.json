@@ -1,14 +1,6 @@
 {
-	"devDependencies": {
-		"@biomejs/biome": "2.5.12",
-		"turbo": "^2.10.12",
-		"typescript": "^7.0.2"
-	},
-	"engines": {
-		"node": ">=20"
-	},
 	"name": "planora",
-	"packageManager": "pnpm@12.4.1",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"build": "turbo build",
@@ -19,5 +11,13 @@
 		"test": "turbo test",
 		"typecheck": "turbo typecheck"
 	},
-	"version": "0.0.1"
+	"devDependencies": {
+		"@biomejs/biome": "2.5.12",
+		"turbo": "^2.10.12",
+		"typescript": "^7.0.2"
+	},
+	"packageManager": "pnpm@12.4.1",
+	"engines": {
+		"node": ">=20"
+	}
 }

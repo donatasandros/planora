@@ -1,4 +1,14 @@
 {
+	"name": "@workspace/ui",
+	"version": "0.0.0",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"fix": "biome check --write .",
+		"format": "biome format --write .",
+		"lint": "biome check .",
+		"typecheck": "tsc --noEmit"
+	},
 	"dependencies": {
 		"@base-ui/react": "^1.8.0",
 		"@fontsource-variable/geist": "^5.3.0",
@@ -26,15 +36,5 @@
 		"./globals.css": "./src/styles/globals.css",
 		"./hooks/*": "./src/hooks/*.ts",
 		"./lib/*": "./src/lib/*.ts"
-	},
-	"name": "@workspace/ui",
-	"private": true,
-	"scripts": {
-		"fix": "biome check --write .",
-		"format": "biome format --write .",
-		"lint": "biome check .",
-		"typecheck": "tsc --noEmit"
-	},
-	"type": "module",
-	"version": "0.0.0"
+	}
 }

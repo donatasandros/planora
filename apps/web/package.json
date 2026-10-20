@@ -1,4 +1,17 @@
 {
+	"name": "web",
+	"version": "0.0.1",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"build": "vite build",
+		"dev": "vite dev",
+		"fix": "biome check --write .",
+		"format": "biome format --write .",
+		"lint": "biome check .",
+		"start": "node dist/server/index.mjs",
+		"typecheck": "tsc --noEmit"
+	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.3.3",
 		"@tanstack/react-devtools": "latest",
@@ -21,18 +34,5 @@
 		"@vitejs/plugin-react": "^6.1.1",
 		"typescript": "^7.0.2",
 		"vite": "^8.2.2"
-	},
-	"name": "web",
-	"private": true,
-	"scripts": {
-		"build": "vite build",
-		"dev": "vite dev",
-		"fix": "biome check --write .",
-		"format": "biome format --write .",
-		"lint": "biome check .",
-		"start": "node dist/server/index.mjs",
-		"typecheck": "tsc --noEmit"
-	},
-	"type": "module",
-	"version": "0.0.1"
+	}
 }
