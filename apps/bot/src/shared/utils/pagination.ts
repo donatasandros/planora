@@ -16,7 +16,7 @@ import {
 import { logger } from "@/core/logger"
 import { emojis } from "@/shared/constants/emojis"
 import { TIMEOUT_MS } from "@/shared/constants/pagination"
-import { replyInteractionError } from "./interaction"
+import { replyInteractionError } from "@/shared/utils/interaction"
 
 export type PaginationCursor = {
 	startedAt: number

@@ -1,23 +1,23 @@
 {
-	"name": "planora",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"build": "turbo build",
-		"check": "turbo check",
-		"dev": "turbo dev",
-		"format": "turbo format",
-		"lint": "turbo lint",
-		"typecheck": "turbo typecheck",
-		"test": "turbo test"
-	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.12",
 		"turbo": "^2.10.12",
 		"typescript": "^7.0.2"
 	},
-	"packageManager": "pnpm@12.4.1",
 	"engines": {
 		"node": ">=20"
-	}
+	},
+	"name": "planora",
+	"packageManager": "pnpm@12.4.1",
+	"private": true,
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"fix": "biome check --write .",
+		"format": "turbo format",
+		"lint": "biome check .",
+		"test": "turbo test",
+		"typecheck": "turbo typecheck"
+	},
+	"version": "0.0.1"
 }

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { resolveProfileVisibility } from "@/features/system/services/visibility"
 import type { User } from "@/features/system/types"
-import { resolveProfileVisibility } from "./visibility"
 
 const { resolveUser } = vi.hoisted(() => ({
 	resolveUser: vi.fn(),

@@ -1,16 +1,4 @@
 {
-	"name": "@workspace/env",
-	"version": "0.0.0",
-	"type": "module",
-	"private": true,
-	"scripts": {
-		"build": "tsdown \"src/**/*.ts\" --format esm --dts --clean",
-		"check": "biome check --write .",
-		"dev": "tsdown \"src/**/*.ts\" --format esm --dts --watch",
-		"format": "biome format --write .",
-		"lint": "biome lint .",
-		"typecheck": "tsc --noEmit"
-	},
 	"dependencies": {
 		"@t3-oss/env-core": "^0.13.11",
 		"zod": "^4.6.5"
@@ -23,12 +11,24 @@
 	},
 	"exports": {
 		".": {
-			"types": "./dist/index.d.mts",
-			"import": "./dist/index.mjs"
+			"import": "./dist/index.mjs",
+			"types": "./dist/index.d.mts"
 		},
 		"./db": {
-			"types": "./dist/db.d.mts",
-			"import": "./dist/db.mjs"
+			"import": "./dist/db.mjs",
+			"types": "./dist/db.d.mts"
 		}
-	}
+	},
+	"name": "@workspace/env",
+	"private": true,
+	"scripts": {
+		"build": "tsdown \"src/**/*.ts\" --format esm --dts --clean",
+		"dev": "tsdown \"src/**/*.ts\" --format esm --dts --watch",
+		"fix": "biome check --write .",
+		"format": "biome format --write .",
+		"lint": "biome check .",
+		"typecheck": "tsc --noEmit"
+	},
+	"type": "module",
+	"version": "0.0.0"
 }

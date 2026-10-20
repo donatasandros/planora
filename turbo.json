@@ -20,8 +20,8 @@
 		"format": {
 			"dependsOn": ["^format"]
 		},
-		"check": {
-			"dependsOn": ["^check"]
+		"fix": {
+			"dependsOn": ["^fix"]
 		},
 		"typecheck": {
 			"dependsOn": ["build"]

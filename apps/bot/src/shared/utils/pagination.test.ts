@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
 import type { PaginationCursor } from "@/shared/utils/pagination"
+import paginate from "@/shared/utils/pagination"
 import {
 	asCommandInteraction,
 	collectCustomIds,
@@ -9,7 +10,6 @@ import {
 	FakeModalSubmitInteraction,
 	type MessagePayload,
 } from "@/test/fakes"
-import paginate from "./pagination"
 
 vi.mock("@/core/logger", () => ({
 	logger: {

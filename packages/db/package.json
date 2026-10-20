@@ -1,19 +1,4 @@
 {
-	"name": "@workspace/db",
-	"version": "0.0.0",
-	"type": "module",
-	"private": true,
-	"scripts": {
-		"build": "tsdown src/index.ts --format esm --dts --clean",
-		"check": "biome check --write .",
-		"dev": "tsdown src/index.ts --format esm --dts --watch",
-		"format": "biome format --write .",
-		"generate": "drizzle-kit generate",
-		"lint": "biome lint .",
-		"push": "drizzle-kit push",
-		"studio": "drizzle-kit studio",
-		"typecheck": "tsc --noEmit"
-	},
 	"dependencies": {
 		"@workspace/env": "workspace:*",
 		"@workspace/logger": "workspace:*",
@@ -31,8 +16,23 @@
 	},
 	"exports": {
 		".": {
-			"types": "./dist/index.d.mts",
-			"import": "./dist/index.mjs"
+			"import": "./dist/index.mjs",
+			"types": "./dist/index.d.mts"
 		}
-	}
+	},
+	"name": "@workspace/db",
+	"private": true,
+	"scripts": {
+		"build": "tsdown src/index.ts --format esm --dts --clean",
+		"dev": "tsdown src/index.ts --format esm --dts --watch",
+		"fix": "biome check --write .",
+		"format": "biome format --write .",
+		"generate": "drizzle-kit generate",
+		"lint": "biome check .",
+		"push": "drizzle-kit push",
+		"studio": "drizzle-kit studio",
+		"typecheck": "tsc --noEmit"
+	},
+	"type": "module",
+	"version": "0.0.0"
 }
