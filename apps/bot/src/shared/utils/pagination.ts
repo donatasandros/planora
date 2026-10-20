@@ -74,7 +74,7 @@ async function paginateStatic({
 	time = TIMEOUT_MS,
 }: StaticPaginationParams) {
 	if (embeds.length === 0) {
-		throw new Error("Pagination required at least one page")
+		throw new Error("Pagination requires at least one page")
 	}
 
 	if (embeds.length === 1) {
