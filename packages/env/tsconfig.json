@@ -10,7 +10,8 @@
 		"paths": {
 			"@/*": ["./src/*"]
 		},
-		"types": ["node"]
+		"types": ["node"],
+		"customConditions": ["development"]
 	},
 	"include": ["."],
 	"exclude": ["node_modules", "dist"]

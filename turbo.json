@@ -24,14 +24,14 @@
 			"dependsOn": ["^fix"]
 		},
 		"typecheck": {
-			"dependsOn": ["build"]
+			"dependsOn": []
 		},
 		"dev": {
 			"cache": false,
 			"persistent": true
 		},
 		"test": {
-			"dependsOn": ["^build"]
+			"dependsOn": []
 		}
 	}
 }

@@ -9,7 +9,8 @@
 		"noEmit": true,
 		"paths": {
 			"@/*": ["./src/*"]
-		}
+		},
+		"customConditions": ["development"]
 	},
 	"include": ["."],
 	"exclude": ["node_modules", "dist"]
