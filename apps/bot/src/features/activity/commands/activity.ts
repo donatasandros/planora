@@ -14,8 +14,8 @@ import { formatActivityRow } from "@/features/activity/utils/formatting"
 import { resolveProfileVisibility } from "@/features/system"
 import { COLORS } from "@/shared/constants/colors"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
+import paginate from "@/shared/pagination"
 import { splitIntoChunks } from "@/shared/utils/array"
-import paginate from "@/shared/utils/pagination"
 import { formatTime } from "@/shared/utils/time"
 
 export const data = new SlashCommandBuilder()

@@ -12,7 +12,7 @@ import {
 } from "@workspace/db"
 import type { ActivityTotal, HistoryPage } from "@/features/activity/types"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
-import type { PaginationCursor } from "@/shared/utils/pagination"
+import type { PaginationCursor } from "@/shared/pagination"
 
 export async function getActivityTotals(
 	userId: string

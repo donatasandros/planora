@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
-import type { PaginationCursor } from "@/shared/utils/pagination"
-import paginate from "@/shared/utils/pagination"
+import type { PaginationCursor } from "@/shared/pagination"
+import paginate from "@/shared/pagination"
 import {
 	asCommandInteraction,
 	collectCustomIds,

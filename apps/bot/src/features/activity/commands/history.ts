@@ -12,7 +12,7 @@ import type { HistorySession } from "@/features/activity/types"
 import { formatActivityRow } from "@/features/activity/utils/formatting"
 import { resolveProfileVisibility } from "@/features/system"
 import { COLORS } from "@/shared/constants/colors"
-import paginate from "@/shared/utils/pagination"
+import paginate from "@/shared/pagination"
 
 export const data = new SlashCommandBuilder()
 	.setName("history")

@@ -1,5 +1,5 @@
 import type { activitySessionsTable } from "@workspace/db"
-import type { PaginationCursor } from "@/shared/utils/pagination"
+import type { PaginationCursor } from "@/shared/pagination"
 
 export type ActiveActivitySession = {
 	id: string
