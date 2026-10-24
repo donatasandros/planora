@@ -1,9 +1,12 @@
 import { type Client, type ClientEvents, Events } from "discord.js"
+import { loadComponents } from "@/core/components/registry"
 import { loadFeatureModules } from "@/core/handlers/load-feature-modules"
 import { logger } from "@/core/logger"
 import type { FeatureEventListener } from "@/core/types/event"
 
 export default async function registerEvents(client: Client): Promise<void> {
+	await loadComponents()
+
 	const modules = await loadFeatureModules("events")
 	const eventRegistry = new Map<keyof ClientEvents, FeatureEventListener[]>()
 

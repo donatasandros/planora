@@ -10,7 +10,7 @@ type LoadedFeatureModule = {
 }
 
 export async function loadFeatureModules(
-	subdir: "commands" | "events"
+	subdir: "commands" | "events" | "components"
 ): Promise<LoadedFeatureModule[]> {
 	const files = await glob(`**/${subdir}/**/*.{js,mjs,ts}`, {
 		cwd: FEATURES_DIR,

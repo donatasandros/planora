@@ -50,6 +50,7 @@ export type ModalSubmitOptions = {
 export class FakeButtonInteraction {
 	readonly user: InteractionUser
 	readonly customId: string
+	readonly message?: FakeMessage
 	readonly replies: MessagePayload[] = []
 	readonly followUps: MessagePayload[] = []
 	readonly shownModals: unknown[] = []
@@ -61,13 +62,26 @@ export class FakeButtonInteraction {
 	private readonly modalSubmit: Promise<FakeModalSubmitInteraction>
 	private modalOptions: ModalSubmitOptions | undefined
 
-	constructor(options: { customId: string; userId?: string }) {
+	constructor(options: {
+		customId: string
+		userId?: string
+		message?: FakeMessage
+	}) {
 		this.customId = options.customId
 		this.user = { id: options.userId ?? "user-1" }
+		this.message = options.message
 		this.modalSubmit = new Promise((resolve, reject) => {
 			this.resolveModal = resolve
 			this.rejectModal = reject
 		})
+	}
+
+	isButton(): boolean {
+		return true
+	}
+
+	isModalSubmit(): boolean {
+		return false
 	}
 
 	async deferUpdate(): Promise<void> {
@@ -116,6 +130,7 @@ export class FakeButtonInteraction {
 export class FakeModalSubmitInteraction {
 	readonly user: InteractionUser
 	readonly customId: string
+	readonly message?: FakeMessage
 	readonly values: Record<string, string>
 	readonly replies: MessagePayload[] = []
 	readonly followUps: MessagePayload[] = []
@@ -127,13 +142,23 @@ export class FakeModalSubmitInteraction {
 		customId: string
 		userId?: string
 		values: Record<string, string>
+		message?: FakeMessage
 	}) {
 		this.user = { id: options.userId ?? "user-1" }
 		this.customId = options.customId
 		this.values = options.values
+		this.message = options.message
 		this.fields = {
 			getTextInputValue: (id: string) => this.values[id] ?? "",
 		}
+	}
+
+	isButton(): boolean {
+		return false
+	}
+
+	isModalSubmit(): boolean {
+		return true
 	}
 
 	async reply(payload: MessagePayload): Promise<void> {

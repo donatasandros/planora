@@ -10,6 +10,7 @@ export class FakeMessage {
 	readonly edits: MessagePayload[] = []
 	createdTimestamp = 1_700_000_000_000
 	collector: FakeCollector | undefined
+	interactionMetadata?: { user: { id: string } }
 
 	async edit(payload: MessagePayload): Promise<this> {
 		this.edits.push(payload)
