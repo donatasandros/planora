@@ -13,7 +13,7 @@ import type {
 	OpenViewOptions,
 	ViewHandle,
 } from "@/core/components/types"
-import { loadFeatureModules } from "@/core/handlers/load-feature-modules"
+import { loadFeatureModules } from "@/core/loaders/feature-modules"
 import { logger } from "@/core/logger"
 import { replyError } from "@/shared/discord/interaction"
 
