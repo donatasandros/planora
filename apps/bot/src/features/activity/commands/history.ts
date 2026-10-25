@@ -49,11 +49,10 @@ export async function execute(
 				return {
 					items: page.sessions,
 					nextCursor: page.nextCursor,
-					totalPages: page.totalPages,
 				}
 			},
-			renderPage: (sessions, pageIndex, totalPages) =>
-				buildHistoryPage(user.username, sessions, pageIndex, totalPages),
+			renderPage: (sessions, pageIndex) =>
+				buildHistoryPage(user.username, sessions, pageIndex),
 			emptyEmbed: new EmbedBuilder()
 				.setColor(COLORS.primary)
 				.setTitle(`${user.username}'s Activity History`)

@@ -31,19 +31,16 @@ type CursorItem = {
 type CursorPage = {
 	items: CursorItem[]
 	nextCursor: PaginationCursor | null
-	totalPages?: number
 }
 
 describe("paginate (cursor)", () => {
 	function createPage(
 		labels: string[],
-		nextCursor: PaginationCursor | null,
-		totalPages?: number
+		nextCursor: PaginationCursor | null
 	): CursorPage {
 		return {
 			items: labels.map((label) => ({ id: label, label })),
 			nextCursor,
-			totalPages,
 		}
 	}
 
@@ -70,7 +67,7 @@ describe("paginate (cursor)", () => {
 
 	it("renders a single page without components when there is no next cursor", async () => {
 		const interaction = createInteraction()
-		const loadPage = vi.fn(async () => createPage(["test-1"], null, 1))
+		const loadPage = vi.fn(async () => createPage(["test-1"], null))
 		const renderPage = vi.fn(() => ({ title: "test-2" }))
 
 		await paginate<CursorItem>({
@@ -85,15 +82,14 @@ describe("paginate (cursor)", () => {
 		expect(interaction.message.collector).toBeUndefined()
 		expect(renderPage).toHaveBeenCalledWith(
 			[{ id: "test-1", label: "test-1" }],
-			0,
-			1
+			0
 		)
 	})
 
 	it("renders only previous and next buttons", async () => {
 		const interaction = createInteraction()
 		const loadPage = vi.fn(async () =>
-			createPage(["test-1"], { startedAt: 1, id: "cursor-1" }, 2)
+			createPage(["test-1"], { startedAt: 1, id: "cursor-1" })
 		)
 		const renderPage = vi.fn(() => ({ title: "test-1" }))
 
@@ -125,8 +121,8 @@ describe("paginate (cursor)", () => {
 		const cursor = { startedAt: 1, id: "cursor-1" }
 		const loadPage = vi.fn(async (pageCursor: PaginationCursor | null) =>
 			pageCursor === null
-				? createPage(["test-1"], cursor, 2)
-				: createPage(["test-2"], null, 2)
+				? createPage(["test-1"], cursor)
+				: createPage(["test-2"], null)
 		)
 		const renderPage = vi.fn((_items: CursorItem[], pageIndex: number) => ({
 			title: `page ${pageIndex}`,
@@ -149,8 +145,7 @@ describe("paginate (cursor)", () => {
 		expect(loadPage).toHaveBeenLastCalledWith(cursor)
 		expect(renderPage).toHaveBeenLastCalledWith(
 			[{ id: "test-2", label: "test-2" }],
-			1,
-			2
+			1
 		)
 	})
 
@@ -159,8 +154,8 @@ describe("paginate (cursor)", () => {
 		const cursor = { startedAt: 1, id: "cursor-1" }
 		const loadPage = vi.fn(async (pageCursor: PaginationCursor | null) =>
 			pageCursor === null
-				? createPage(["test-1"], cursor, 2)
-				: createPage(["test-2"], null, 2)
+				? createPage(["test-1"], cursor)
+				: createPage(["test-2"], null)
 		)
 		const renderPage = vi.fn((_items: CursorItem[], pageIndex: number) => ({
 			title: `page ${pageIndex}`,
@@ -184,8 +179,7 @@ describe("paginate (cursor)", () => {
 		expect(loadPage).toHaveBeenCalledTimes(2)
 		expect(renderPage).toHaveBeenLastCalledWith(
 			[{ id: "test-2", label: "test-2" }],
-			1,
-			2
+			1
 		)
 	})
 
@@ -195,7 +189,7 @@ describe("paginate (cursor)", () => {
 		let resolveLoad: ((page: CursorPage) => void) | undefined
 		const loadPage = vi.fn((pageCursor: PaginationCursor | null) => {
 			if (pageCursor === null) {
-				return Promise.resolve(createPage(["test-1"], cursor, 2))
+				return Promise.resolve(createPage(["test-1"], cursor))
 			}
 
 			return new Promise<CursorPage>((resolve) => {
@@ -229,14 +223,13 @@ describe("paginate (cursor)", () => {
 		expect(second.deferUpdateCalls).toBe(1)
 		expect(renderPage).toHaveBeenCalledTimes(1)
 
-		resolveLoad?.(createPage(["test-2"], null, 2))
+		resolveLoad?.(createPage(["test-2"], null))
 
 		await first
 
 		expect(renderPage).toHaveBeenLastCalledWith(
 			[{ id: "test-2", label: "test-2" }],
-			1,
-			2
+			1
 		)
 	})
 
@@ -245,7 +238,7 @@ describe("paginate (cursor)", () => {
 		const cursor = { startedAt: 1, id: "cursor-1" }
 		const loadPage = vi.fn(async (pageCursor: PaginationCursor | null) => {
 			if (pageCursor === null) {
-				return createPage(["test-1"], cursor, 2)
+				return createPage(["test-1"], cursor)
 			}
 
 			throw new Error("database unavailable")
@@ -278,7 +271,7 @@ describe("paginate (cursor)", () => {
 	it("ignores clicks from another user", async () => {
 		const interaction = createInteraction()
 		const loadPage = vi.fn(async () =>
-			createPage(["test-1"], { startedAt: 1, id: "cursor-1" }, 2)
+			createPage(["test-1"], { startedAt: 1, id: "cursor-1" })
 		)
 		const renderPage = vi.fn(() => ({ title: "test-1" }))
 
@@ -306,7 +299,7 @@ describe("paginate (cursor)", () => {
 	it("does not move back when previous is clicked on the first page", async () => {
 		const interaction = createInteraction()
 		const loadPage = vi.fn(async () =>
-			createPage(["test-1"], { startedAt: 1, id: "cursor-1" }, 2)
+			createPage(["test-1"], { startedAt: 1, id: "cursor-1" })
 		)
 		const renderPage = vi.fn(() => ({ title: "test-1" }))
 
@@ -329,7 +322,7 @@ describe("paginate (cursor)", () => {
 	it("strips the components when the collector ends", async () => {
 		const interaction = createInteraction()
 		const loadPage = vi.fn(async () =>
-			createPage(["test-1"], { startedAt: 1, id: "cursor-1" }, 2)
+			createPage(["test-1"], { startedAt: 1, id: "cursor-1" })
 		)
 		const renderPage = vi.fn(() => ({ title: "test-1" }))
 
@@ -348,20 +341,17 @@ describe("paginate (cursor)", () => {
 		expect(interaction.message.edits.at(-1)?.components).toEqual([])
 	})
 
-	it("reuses the total page count captured by the first load", async () => {
+	it("renders only the current page number", async () => {
 		const interaction = createInteraction()
 		const cursor = { startedAt: 1, id: "cursor-1" }
 		const loadPage = vi.fn(async (pageCursor: PaginationCursor | null) =>
 			pageCursor === null
-				? createPage(["test-1"], cursor, 3)
+				? createPage(["test-1"], cursor)
 				: createPage(["test-2"], null)
 		)
-		const renderPage = vi.fn(
-			(_items: CursorItem[], pageIndex: number, totalPages?: number) => ({
-				title: `page ${pageIndex}`,
-				footer: { text: `Page ${pageIndex + 1} / ${totalPages}` },
-			})
-		)
+		const renderPage = vi.fn((_items: CursorItem[], pageIndex: number) => ({
+			title: `page ${pageIndex}`,
+		}))
 
 		await paginate<CursorItem>({
 			mode: "cursor",
@@ -378,8 +368,7 @@ describe("paginate (cursor)", () => {
 
 		expect(renderPage).toHaveBeenLastCalledWith(
 			[{ id: "test-2", label: "test-2" }],
-			1,
-			3
+			1
 		)
 	})
 })

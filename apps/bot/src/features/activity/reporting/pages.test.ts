@@ -92,11 +92,11 @@ describe("buildHistoryPage", () => {
 	it("renders sessions with the page footer", () => {
 		const sessions = [makeSession("Game", 0), makeSession("Music", 1)]
 
-		const page = buildHistoryPage("user", sessions, 1, 4)
+		const page = buildHistoryPage("user", sessions, 1)
 
 		expect(page.title).toBe("user's Activity History")
 		expect(page.description).toContain("Game")
 		expect(page.description).toContain("Music")
-		expect(page.footer?.text).toBe("Page 2 / 4")
+		expect(page.footer?.text).toBe("Page 2")
 	})
 })

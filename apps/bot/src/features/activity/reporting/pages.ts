@@ -116,8 +116,7 @@ export function buildActivityPages(
 export function buildHistoryPage(
 	username: string,
 	sessions: HistorySession[],
-	pageIndex: number,
-	totalPages?: number
+	pageIndex: number
 ): APIEmbed {
 	return new EmbedBuilder()
 		.setColor(COLORS.primary)
@@ -133,7 +132,7 @@ export function buildHistoryPage(
 				.join("\n")
 		)
 		.setFooter({
-			text: `Page ${pageIndex + 1} / ${totalPages}`,
+			text: `Page ${pageIndex + 1}`,
 		})
 		.toJSON()
 }

@@ -20,8 +20,6 @@ export async function paginateCursor<T>({
 }: CursorPaginationParams<T>) {
 	const firstPage = await loadPage(null)
 
-	const totalPages = firstPage.totalPages
-
 	if (firstPage.items.length === 0) {
 		return interaction.editReply({
 			embeds: [emptyEmbed],
@@ -31,7 +29,7 @@ export async function paginateCursor<T>({
 
 	if (firstPage.nextCursor === null) {
 		return interaction.editReply({
-			embeds: [renderPage(firstPage.items, 0, totalPages)],
+			embeds: [renderPage(firstPage.items, 0)],
 			components: [],
 		})
 	}
@@ -48,7 +46,7 @@ export async function paginateCursor<T>({
 	const actionRow = buildCursorActionRow(buttons)
 
 	const message = await interaction.editReply({
-		embeds: [renderPage(firstPage.items, index, totalPages)],
+		embeds: [renderPage(firstPage.items, index)],
 		components: [actionRow],
 	})
 
@@ -59,10 +57,12 @@ export async function paginateCursor<T>({
 	}
 
 	async function render(): Promise<void> {
+		const currentPage = pages[index]
+
 		updateButtonState()
 
 		await message.edit({
-			embeds: [renderPage(pages[index].items, index, totalPages)],
+			embeds: [renderPage(currentPage.items, index)],
 			components: [actionRow],
 		})
 	}

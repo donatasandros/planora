@@ -8,7 +8,6 @@ export type PaginationCursor = {
 export type CursorPage<T> = {
 	items: T[]
 	nextCursor: PaginationCursor | null
-	totalPages?: number
 }
 
 export type SearchParams = {
@@ -33,7 +32,7 @@ export type StaticPaginationParams = BasePaginationParams & {
 export type CursorPaginationParams<T> = BasePaginationParams & {
 	mode: "cursor"
 	loadPage: (cursor: PaginationCursor | null) => Promise<CursorPage<T>>
-	renderPage: (items: T[], pageIndex: number, totalPages?: number) => APIEmbed
+	renderPage: (items: T[], pageIndex: number) => APIEmbed
 	emptyEmbed: APIEmbed
 }
 

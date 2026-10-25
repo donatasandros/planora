@@ -2,7 +2,6 @@ import {
 	activitySessionsTable,
 	activityTotalsTable,
 	and,
-	count,
 	db,
 	desc,
 	eq,
@@ -50,19 +49,6 @@ export async function getActivityHistoryPage(
 		? and(baseCondition, cursorCondition)
 		: baseCondition
 
-	let totalPages: number | undefined
-
-	if (!cursor) {
-		const [result] = await db
-			.select({ total: count() })
-			.from(activitySessionsTable)
-			.where(baseCondition)
-
-		const totalSessions = Number(result?.total ?? 0)
-
-		totalPages = Math.ceil(totalSessions / HISTORY_PAGE_SIZE)
-	}
-
 	const rows = await db
 		.select({
 			id: activitySessionsTable.id,
@@ -91,6 +77,5 @@ export async function getActivityHistoryPage(
 			hasNextPage && lastSession
 				? { startedAt: lastSession.startedAt, id: lastSession.id }
 				: null,
-		totalPages,
 	}
 }

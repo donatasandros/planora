@@ -38,7 +38,6 @@ export type HistorySession = {
 export type HistoryPage = {
 	sessions: HistorySession[]
 	nextCursor: PaginationCursor | null
-	totalPages?: number
 }
 
 export type SessionSweeper = {
