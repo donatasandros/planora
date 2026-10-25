@@ -6,6 +6,7 @@ import {
 } from "discord.js"
 import { getSystemInfo } from "@/features/utility/utils/system-info"
 import { COLORS } from "@/shared/constants/colors"
+import { ensureApplicationOwner } from "@/shared/discord/owner"
 import { formatTime } from "@/shared/utils/time"
 
 export const data = new SlashCommandBuilder()
@@ -16,6 +17,10 @@ export async function execute(
 	client: Client,
 	interaction: ChatInputCommandInteraction
 ) {
+	if (!(await ensureApplicationOwner(client, interaction))) {
+		return
+	}
+
 	await interaction.deferReply()
 
 	const reply = await interaction.fetchReply()

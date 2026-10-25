@@ -33,6 +33,10 @@ export class FakeChatInputCommandInteraction {
 		return this.message
 	}
 
+	async fetchReply(): Promise<FakeMessage> {
+		return this.message
+	}
+
 	async deferReply(payload?: MessagePayload): Promise<void> {
 		this.deferred = true
 
