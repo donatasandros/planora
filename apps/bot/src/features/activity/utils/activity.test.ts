@@ -76,7 +76,8 @@ describe("buildActivitySession", () => {
 		const session = buildActivitySession(activity, 1600000000)
 
 		expect(session).toMatchObject({
-			activityKey: "0:123:Game",
+			activityKey:
+				"4c330145effd681c2ad6e59126d091b7613731f5cc3f5c7cebb6c88b1ea27dc5",
 			activityName: "Game",
 			activityType: ActivityType.Playing,
 			applicationId: "123",
