@@ -1,14 +1,11 @@
 import { randomUUID } from "node:crypto"
 import { type Activity, ActivityType } from "discord.js"
 import { ACTIVITY_REDIS_KEYS } from "@/features/activity/constants"
+import { getActivityKey } from "@/features/activity/identity/activity-key"
 import type { ActiveActivitySession } from "@/features/activity/types"
 
 export function getActiveSessionsKey(userId: string): string {
 	return `${ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX}${userId}`
-}
-
-export function getActivityKey(activity: Activity): string {
-	return [activity.type, activity.applicationId ?? "", activity.name].join(":")
 }
 
 export function getActivityStartTime(activity: Activity): number {

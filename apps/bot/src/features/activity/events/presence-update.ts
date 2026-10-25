@@ -1,6 +1,5 @@
-import { createHash } from "node:crypto"
 import { acquireLock, claim, deleteKey, releaseLock } from "@workspace/redis"
-import { ActivityType, Events, type Presence } from "discord.js"
+import { Events } from "discord.js"
 import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
 import {
@@ -13,11 +12,14 @@ import {
 	setActiveSessions,
 	startActivitySession,
 } from "@/features/activity/services/sessions"
-import type { ActiveActivitySessions } from "@/features/activity/types"
 import {
-	getActiveSessionsKey,
-	getActivityKey,
-} from "@/features/activity/utils/activity"
+	createFingerprintMemo,
+	getPresenceFingerprint,
+	hashFingerprint,
+} from "@/features/activity/tracking/fingerprint"
+import { reconcileSessions } from "@/features/activity/tracking/reconcile"
+import type { ActiveActivitySessions } from "@/features/activity/types"
+import { getActiveSessionsKey } from "@/features/activity/utils/activity"
 import { resolveUser } from "@/features/system"
 
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30
@@ -26,60 +28,10 @@ const PRESENCE_DEDUPLICATION_TTL_SECONDS = 10
 const FINGERPRINT_MEMO_TTL_MS = 10 * 1000 // 10 seconds
 const FINGERPRINT_MEMO_MAX_ENTRIES = 50_000
 
-const fingerprintMemo = new Map<string, { hash: string; expiresAt: number }>()
-
-function getPresenceFingerprint(presence: Presence): string {
-	const activities = presence.activities
-		.map((activity) => ({
-			type: activity.type,
-			name: activity.name,
-			applicationId: activity.applicationId ?? null,
-			url: activity.url ?? null,
-			details: activity.details ?? null,
-			state: activity.state ?? null,
-		}))
-		.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)))
-
-	return JSON.stringify({
-		status: presence.status,
-		activities,
-	})
-}
-
-function hash(value: string): string {
-	return createHash("sha256").update(value).digest("hex")
-}
-
-function isMemoized(userId: string, hash: string): boolean {
-	const entry = fingerprintMemo.get(userId)
-
-	if (!entry) {
-		return false
-	}
-
-	if (entry.expiresAt <= Date.now() || entry.hash !== hash) {
-		fingerprintMemo.delete(userId)
-
-		return false
-	}
-
-	return true
-}
-
-function rememberFingerprint(userId: string, hash: string): void {
-	if (fingerprintMemo.size >= FINGERPRINT_MEMO_MAX_ENTRIES) {
-		const oldest = fingerprintMemo.keys().next()
-
-		if (!oldest.done) {
-			fingerprintMemo.delete(oldest.value)
-		}
-	}
-
-	fingerprintMemo.set(userId, {
-		hash,
-		expiresAt: Date.now() + FINGERPRINT_MEMO_TTL_MS,
-	})
-}
+const fingerprintMemo = createFingerprintMemo(
+	FINGERPRINT_MEMO_TTL_MS,
+	FINGERPRINT_MEMO_MAX_ENTRIES
+)
 
 export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 	priority: 50,
@@ -95,13 +47,13 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 		}
 
 		const fingerprint = getPresenceFingerprint(newPresence)
-		const fingerprintHash = hash(fingerprint)
+		const fingerprintHash = hashFingerprint(fingerprint)
 
 		const deduplicationKey = ["presence:event", userId, fingerprintHash].join(
 			":"
 		)
 
-		if (isMemoized(userId, fingerprintHash)) {
+		if (fingerprintMemo.isMemoized(userId, fingerprintHash)) {
 			return
 		}
 
@@ -160,35 +112,27 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 					await deleteKey(activeSessionsKey)
 				}
 
-				rememberFingerprint(userId, fingerprintHash)
+				fingerprintMemo.remember(userId, fingerprintHash)
 
 				return
 			}
 
+			const { started, kept, ended } = reconcileSessions({
+				previous: previousSessions,
+				activities: newPresence.activities,
+				trackCustom: TRACK_CUSTOM_ACTIVITIES,
+				now,
+			})
 			const nextSessions: ActiveActivitySessions = {}
 
-			for (const activity of newPresence.activities) {
-				if (
-					!TRACK_CUSTOM_ACTIVITIES &&
-					activity.type === ActivityType.Custom
-				) {
-					continue
-				}
+			for (const session of kept) {
+				nextSessions[session.activityKey] = session
+			}
 
-				const activityKey = getActivityKey(activity)
-				const existingSession = previousSessions[activityKey]
-
-				if (existingSession) {
-					nextSessions[activityKey] = {
-						...existingSession,
-						lastSeenAt: now,
-					}
-					continue
-				}
-
+			for (const activity of started) {
 				const session = await startActivitySession(userId, activity)
 
-				nextSessions[activityKey] = session
+				nextSessions[session.activityKey] = session
 
 				logger.debug(
 					{
@@ -201,13 +145,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 				)
 			}
 
-			for (const [activityKey, session] of Object.entries(
-				previousSessions
-			)) {
-				if (nextSessions[activityKey]) {
-					continue
-				}
-
+			for (const session of ended) {
 				const durationSeconds = Math.max(0, now - session.startedAt)
 
 				await finishActivitySession(session.id, now, durationSeconds)
@@ -230,7 +168,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 				await deleteKey(activeSessionsKey)
 			}
 
-			rememberFingerprint(userId, fingerprintHash)
+			fingerprintMemo.remember(userId, fingerprintHash)
 		} finally {
 			await releaseLock(lockKey, lockToken)
 		}

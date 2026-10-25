@@ -3,12 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import {
 	buildActivitySession,
 	getActiveSessionsKey,
-	getActivityKey,
 	getActivityStartTime,
 	isCustomActivity,
 } from "@/features/activity/utils/activity"
 
-const FIXED_NOW_MS = 1700000000000
+const FIXED_NOW_MS = 1_700_000_000_000
 
 function makeActivity(overrides: Partial<Activity> = {}): Activity {
 	return {
@@ -27,26 +26,6 @@ afterEach(() => {
 describe("getActiveSessionsKey", () => {
 	it("namespaces the key by user", () => {
 		expect(getActiveSessionsKey("42")).toBe("activity:active:42")
-	})
-})
-
-describe("getActivityKey", () => {
-	it("is stable for identical activities", () => {
-		expect(getActivityKey(makeActivity())).toBe(
-			getActivityKey(makeActivity())
-		)
-	})
-
-	it("distinguishes activities by application", () => {
-		expect(getActivityKey(makeActivity({ applicationId: "1" }))).not.toBe(
-			getActivityKey(makeActivity({ applicationId: "2" }))
-		)
-	})
-
-	it("distinguishes activities by type", () => {
-		expect(
-			getActivityKey(makeActivity({ type: ActivityType.Playing }))
-		).not.toBe(getActivityKey(makeActivity({ type: ActivityType.Watching })))
 	})
 })
 
@@ -97,7 +76,7 @@ describe("buildActivitySession", () => {
 		const session = buildActivitySession(activity, 1600000000)
 
 		expect(session).toMatchObject({
-			activityKey: getActivityKey(activity),
+			activityKey: "0:123:Game",
 			activityName: "Game",
 			activityType: ActivityType.Playing,
 			applicationId: "123",

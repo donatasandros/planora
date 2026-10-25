@@ -11,7 +11,7 @@ import {
 	or,
 } from "@workspace/db"
 import type { ActivityTotal, HistoryPage } from "@/features/activity/types"
-import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
+import { HISTORY_PAGE_SIZE } from "@/shared/constants/pagination"
 import type { PaginationCursor } from "@/shared/pagination"
 
 export async function getActivityTotals(
@@ -60,7 +60,7 @@ export async function getActivityHistoryPage(
 
 		const totalSessions = Number(result?.total ?? 0)
 
-		totalPages = Math.ceil(totalSessions / ITEMS_PER_PAGE)
+		totalPages = Math.ceil(totalSessions / HISTORY_PAGE_SIZE)
 	}
 
 	const rows = await db
@@ -79,10 +79,10 @@ export async function getActivityHistoryPage(
 			desc(activitySessionsTable.startedAt),
 			desc(activitySessionsTable.id)
 		)
-		.limit(ITEMS_PER_PAGE + 1)
+		.limit(HISTORY_PAGE_SIZE + 1)
 
-	const hasNextPage = rows.length > ITEMS_PER_PAGE
-	const sessions = rows.slice(0, ITEMS_PER_PAGE)
+	const hasNextPage = rows.length > HISTORY_PAGE_SIZE
+	const sessions = rows.slice(0, HISTORY_PAGE_SIZE)
 	const lastSession = sessions.at(-1)
 
 	return {

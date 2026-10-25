@@ -1,14 +1,13 @@
 import {
-	type APIEmbed,
 	type ChatInputCommandInteraction,
 	type Client,
 	EmbedBuilder,
 	SlashCommandBuilder,
 } from "discord.js"
 import { logger } from "@/core/logger"
+import { buildHistoryPage } from "@/features/activity/reporting/pages"
 import { getActivityHistoryPage } from "@/features/activity/services/history"
 import type { HistorySession } from "@/features/activity/types"
-import { formatActivityRow } from "@/features/activity/utils/formatting"
 import { resolveProfileVisibility } from "@/features/system"
 import { COLORS } from "@/shared/constants/colors"
 import { viewProfile } from "@/shared/discord/profile-view"
@@ -24,30 +23,6 @@ export const data = new SlashCommandBuilder()
 			.setRequired(false)
 	)
 
-function buildHistoryEmbed(
-	username: string,
-	sessions: HistorySession[],
-	pageIndex: number,
-	totalPages?: number
-): APIEmbed {
-	return new EmbedBuilder()
-		.setColor(COLORS.primary)
-		.setTitle(`${username}'s Activity History`)
-		.setDescription(
-			sessions
-				.map((session) =>
-					formatActivityRow(session.activityName, {
-						durationSeconds: session.durationSeconds,
-						timestamp: session.endedAt,
-					})
-				)
-				.join("\n")
-		)
-		.setFooter({
-			text: `Page ${pageIndex + 1} / ${totalPages}`,
-		})
-		.toJSON()
-}
 export async function execute(
 	_client: Client,
 	interaction: ChatInputCommandInteraction
@@ -78,7 +53,7 @@ export async function execute(
 				}
 			},
 			renderPage: (sessions, pageIndex, totalPages) =>
-				buildHistoryEmbed(user.username, sessions, pageIndex, totalPages),
+				buildHistoryPage(user.username, sessions, pageIndex, totalPages),
 			emptyEmbed: new EmbedBuilder()
 				.setColor(COLORS.primary)
 				.setTitle(`${user.username}'s Activity History`)
