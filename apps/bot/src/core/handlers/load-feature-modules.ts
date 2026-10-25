@@ -4,16 +4,19 @@ import glob from "fast-glob"
 
 const FEATURES_DIR = path.join(import.meta.dirname, "../../features")
 
+type FeatureSubdir = "commands" | "events" | "components"
+
 type LoadedFeatureModule = {
 	filePath: string
 	mod: Record<string, unknown>
 }
 
 export async function loadFeatureModules(
-	subdir: "commands" | "events" | "components"
+	subdir: FeatureSubdir
 ): Promise<LoadedFeatureModule[]> {
 	const files = await glob(`**/${subdir}/**/*.{js,mjs,ts}`, {
 		cwd: FEATURES_DIR,
+		ignore: ["**/*.test.*", "**/*.spec.*", "**/__tests__/**"],
 	})
 	const modules: LoadedFeatureModule[] = []
 
