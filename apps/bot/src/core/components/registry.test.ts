@@ -1,4 +1,4 @@
-import type { ButtonInteraction, Interaction, Message } from "discord.js"
+import type { Interaction, Message } from "discord.js"
 import { describe, expect, it, vi } from "vitest"
 import { defineButton } from "@/core/components/define-component"
 import { dispatchComponent, parseCustomId } from "@/core/components/dispatch"
@@ -9,6 +9,7 @@ import {
 import type {
 	ButtonHandler,
 	ComponentControls,
+	ModalHandler,
 	ViewHandle,
 } from "@/core/components/types"
 import {
@@ -42,10 +43,6 @@ function asMessage(message: FakeMessage): Message {
 	return message as unknown as Message
 }
 
-function asButton(interaction: FakeButtonInteraction): ButtonInteraction {
-	return interaction as unknown as ButtonInteraction
-}
-
 function getCollector(message: FakeMessage): FakeCollector {
 	if (!message.collector) {
 		throw new Error("Expected a collector")
@@ -59,6 +56,7 @@ function openTestView(
 	options: {
 		message: FakeMessage
 		onButton?: ButtonHandler
+		onModal?: ModalHandler
 		time?: number
 	}
 ): ViewHandle {
@@ -69,6 +67,7 @@ function openTestView(
 		message: asMessage(options.message),
 		time: options.time ?? 60_000,
 		onButton: options.onButton,
+		onModal: options.onModal,
 	})
 }
 
@@ -248,21 +247,12 @@ describe("dispatchComponent", () => {
 		expect(message.edits.at(-1)?.components).toEqual([])
 	})
 
-	it("scopes modal submits to the view owner", async () => {
+	it("routes modal submits to the view's modal handler", async () => {
 		const registry = createComponentRegistry()
 		const message = new FakeMessage()
-		const view = openTestView(registry, { message })
+		const onModal = vi.fn()
 
-		const button = new FakeButtonInteraction({
-			customId: "demo:session:search",
-			userId: OWNER_ID,
-		})
-
-		const pending = view.awaitModal({
-			buttonInteraction: asButton(button),
-			customId: "demo:session:modal",
-			time: 60_000,
-		})
+		openTestView(registry, { message, onModal })
 
 		const submission = new FakeModalSubmitInteraction({
 			customId: "demo:session:modal",
@@ -270,15 +260,67 @@ describe("dispatchComponent", () => {
 			values: {},
 		})
 
-		expect(button.submitModal(submission)).toBe(true)
-		await expect(pending).resolves.toBe(submission)
+		expect(await dispatchComponent(asInteraction(submission), registry)).toBe(
+			false
+		)
+		expect(onModal).toHaveBeenCalledOnce()
+		expect(onModal).toHaveBeenCalledWith(submission)
+	})
 
-		const foreign = new FakeModalSubmitInteraction({
+	it("denies a modal submit from a foreign user", async () => {
+		const registry = createComponentRegistry()
+		const message = new FakeMessage()
+		const onModal = vi.fn()
+
+		openTestView(registry, { message, onModal })
+
+		const submission = new FakeModalSubmitInteraction({
 			customId: "demo:session:modal",
 			userId: OTHER_USER_ID,
 			values: {},
 		})
 
-		expect(button.submitModal(foreign)).toBe(false)
+		await dispatchComponent(asInteraction(submission), registry)
+
+		expect(onModal).not.toHaveBeenCalled()
+		expect(submission.replies[0]?.content).toBe(
+			"Only the original user can interact with this button."
+		)
+	})
+
+	it("rejects a modal submit from another view", async () => {
+		const registry = createComponentRegistry()
+		const message = new FakeMessage()
+		const onModal = vi.fn()
+
+		openTestView(registry, { message, onModal })
+
+		const submission = new FakeModalSubmitInteraction({
+			customId: "demo:other:modal",
+			userId: OWNER_ID,
+			values: {},
+		})
+
+		await dispatchComponent(asInteraction(submission), registry)
+
+		expect(onModal).not.toHaveBeenCalled()
+		expect(submission.replies[0]?.content).toBe("This interaction expired.")
+	})
+
+	it("replies with an expired notice when a view has no modal handler", async () => {
+		const registry = createComponentRegistry()
+		const message = new FakeMessage()
+
+		openTestView(registry, { message })
+
+		const submission = new FakeModalSubmitInteraction({
+			customId: "demo:session:modal",
+			userId: OWNER_ID,
+			values: {},
+		})
+
+		await dispatchComponent(asInteraction(submission), registry)
+
+		expect(submission.replies[0]?.content).toBe("This interaction expired.")
 	})
 })

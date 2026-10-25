@@ -1,4 +1,6 @@
+import type { Interaction } from "discord.js"
 import { describe, expect, it, vi } from "vitest"
+import { dispatchComponent } from "@/core/components/dispatch"
 import paginate from "@/shared/pagination"
 import {
 	asCommandInteraction,
@@ -33,6 +35,10 @@ const SEARCH = {
 	label: "Activity name",
 	placeholder: "e.g. Minecraft",
 	notFoundMessage: "Activity not found",
+}
+
+function asInteraction(interaction: FakeModalSubmitInteraction): Interaction {
+	return interaction as unknown as Interaction
 }
 
 describe("paginate (static)", () => {
@@ -304,23 +310,16 @@ describe("paginate (static)", () => {
 		const ids = getButtonIds(interaction.editReplies[0])
 		const searchButton = createButton(ids, ":search")
 
-		const pending = collector.emit("collect", searchButton)
-
-		await vi.waitFor(() => {
-			expect(searchButton.shownModals).toHaveLength(1)
-		})
+		await collector.emit("collect", searchButton)
 
 		const [modalId, inputId] = collectCustomIds(searchButton.shownModals[0])
+		const submission = new FakeModalSubmitInteraction({
+			customId: modalId ?? "",
+			userId: OWNER_ID,
+			values: { [inputId ?? ""]: "  CHESS  " },
+		})
 
-		searchButton.submitModal(
-			new FakeModalSubmitInteraction({
-				customId: modalId ?? "",
-				userId: OWNER_ID,
-				values: { [inputId ?? ""]: "  CHESS  " },
-			})
-		)
-
-		await pending
+		await dispatchComponent(asInteraction(submission))
 
 		expect(interaction.message.edits.at(-1)?.embeds).toEqual([embeds[1]])
 	})
@@ -339,30 +338,23 @@ describe("paginate (static)", () => {
 		const ids = getButtonIds(interaction.editReplies[0])
 		const searchButton = createButton(ids, ":search")
 
-		const pending = collector.emit("collect", searchButton)
-
-		await vi.waitFor(() => {
-			expect(searchButton.shownModals).toHaveLength(1)
-		})
+		await collector.emit("collect", searchButton)
 
 		const [modalId, inputId] = collectCustomIds(searchButton.shownModals[0])
-
 		const submission = new FakeModalSubmitInteraction({
 			customId: modalId ?? "",
 			userId: OWNER_ID,
 			values: { [inputId ?? ""]: "tetris" },
 		})
 
-		searchButton.submitModal(submission)
-
-		await pending
+		await dispatchComponent(asInteraction(submission))
 
 		expect(submission.replies).toHaveLength(1)
 		expect(submission.replies[0]?.content).toBe(SEARCH.notFoundMessage)
 		expect(interaction.message.edits).toHaveLength(0)
 	})
 
-	it("does not re-render when the search modal expires", async () => {
+	it("does not re-render when the search submit belongs to another view", async () => {
 		const interaction = createInteraction()
 
 		await paginate({
@@ -375,20 +367,23 @@ describe("paginate (static)", () => {
 		const ids = getButtonIds(interaction.editReplies[0])
 		const searchButton = createButton(ids, ":search")
 
-		const pending = collector.emit("collect", searchButton)
+		await collector.emit("collect", searchButton)
 
-		await vi.waitFor(() => {
-			expect(searchButton.shownModals).toHaveLength(1)
+		const [modalId, inputId] = collectCustomIds(searchButton.shownModals[0])
+		const [feature, , action] = (modalId ?? "").split(":")
+		const submission = new FakeModalSubmitInteraction({
+			customId: `${feature}:other-session:${action}`,
+			userId: OWNER_ID,
+			values: { [inputId ?? ""]: "chess" },
 		})
 
-		searchButton.timeoutModal()
+		await dispatchComponent(asInteraction(submission))
 
-		await pending
-
+		expect(submission.replies[0]?.content).toBe("This interaction expired.")
 		expect(interaction.message.edits).toHaveLength(0)
 	})
 
-	it("ignores a search submitted by another user", async () => {
+	it("denies a search submitted by another user", async () => {
 		const interaction = createInteraction()
 
 		await paginate({
@@ -401,28 +396,21 @@ describe("paginate (static)", () => {
 		const ids = getButtonIds(interaction.editReplies[0])
 		const searchButton = createButton(ids, ":search")
 
-		const pending = collector.emit("collect", searchButton)
-
-		await vi.waitFor(() => {
-			expect(searchButton.shownModals).toHaveLength(1)
-		})
+		await collector.emit("collect", searchButton)
 
 		const [modalId, inputId] = collectCustomIds(searchButton.shownModals[0])
+		const submission = new FakeModalSubmitInteraction({
+			customId: modalId ?? "",
+			userId: OTHER_USER_ID,
+			values: { [inputId ?? ""]: "chess" },
+		})
 
-		const accepted = searchButton.submitModal(
-			new FakeModalSubmitInteraction({
-				customId: modalId ?? "",
-				userId: OTHER_USER_ID,
-				values: { [inputId ?? ""]: "chess" },
-			})
+		await dispatchComponent(asInteraction(submission))
+
+		expect(submission.replies).toHaveLength(1)
+		expect(submission.replies[0]?.content).toBe(
+			"Only the original user can interact with this button."
 		)
-
-		expect(accepted).toBe(false)
-
-		searchButton.timeoutModal()
-
-		await pending
-
 		expect(interaction.message.edits).toHaveLength(0)
 	})
 })

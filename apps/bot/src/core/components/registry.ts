@@ -20,18 +20,12 @@ import { replyInteractionError } from "@/shared/utils/interaction"
 const OWNER_ONLY_MESSAGE =
 	"Only the original user can interact with this button."
 
-type Deferred = {
-	promise: Promise<void>
-	resolve: () => void
-}
-
 type ViewState = ViewHandle & {
 	message: Message
 	time: number
 	onButton: ButtonHandler | undefined
 	collector: InteractionCollector<ButtonInteraction>
 	timer: NodeJS.Timeout | undefined
-	closeDeferred: Deferred
 }
 
 export type ComponentRegistry = {
@@ -46,15 +40,6 @@ export type ComponentRegistry = {
 		kind: ComponentInstance["kind"],
 		customId: string
 	) => ComponentInstance | undefined
-}
-
-function createDeferred(): Deferred {
-	let resolve!: () => void
-	const promise = new Promise<void>((done) => {
-		resolve = done
-	})
-
-	return { promise, resolve }
 }
 
 function viewKey(feature: string, sessionId: string): string {
@@ -132,7 +117,6 @@ export function createComponentRegistry(): ComponentRegistry {
 		}
 
 		views.delete(viewKey(view.feature, view.sessionId))
-		view.closeDeferred.resolve()
 
 		if (stopCollector) {
 			view.collector.stop("expired")
@@ -194,32 +178,10 @@ export function createComponentRegistry(): ComponentRegistry {
 			message: options.message,
 			time: options.time,
 			onButton: options.onButton,
+			onModal: options.onModal,
 			collector,
 			timer: undefined,
-			closeDeferred: createDeferred(),
-			awaitModal: async ({ buttonInteraction, customId, time }) => {
-				if (view.closed) {
-					return null
-				}
-
-				const submitted = await Promise.race([
-					buttonInteraction
-						.awaitModalSubmit({
-							filter: (modalInteraction) =>
-								modalInteraction.customId === customId &&
-								modalInteraction.user.id === view.ownerId,
-							time,
-						})
-						.catch(() => null),
-					view.closeDeferred.promise.then(() => null),
-				])
-
-				if (!submitted || view.closed) {
-					return null
-				}
-
-				return submitted
-			},
+			resetExpiry: () => scheduleExpiry(view),
 			close: () => closeView(view, true),
 		}
 

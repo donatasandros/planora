@@ -1,9 +1,16 @@
 import { Events } from "discord.js"
+import { dispatchComponent } from "@/core/components/dispatch"
 import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
 import { replyInteractionError } from "@/shared/utils/interaction"
 
 export const interactionCreateListeners = [
+	defineEvent(Events.InteractionCreate, {
+		priority: 5,
+		async execute(_client, interaction) {
+			return dispatchComponent(interaction)
+		},
+	}),
 	defineEvent(Events.InteractionCreate, {
 		priority: 10,
 		async execute(client, interaction) {

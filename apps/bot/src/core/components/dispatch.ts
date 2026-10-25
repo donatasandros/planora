@@ -69,8 +69,31 @@ export async function dispatchComponent(
 		return
 	}
 
-	if (registry.getView(parsed.feature, parsed.sessionId)) {
-		return
+	const view = registry.getView(parsed.feature, parsed.sessionId)
+
+	if (view) {
+		if (!interaction.isModalSubmit()) {
+			return
+		}
+
+		if (!view.onModal) {
+			await replyExpired(interaction)
+			return false
+		}
+
+		await runComponentHandler(
+			interaction,
+			{
+				ownerId: view.ownerId,
+				ownerOnly: true,
+			},
+			async () => {
+				await view.onModal?.(interaction)
+				view.resetExpiry()
+			}
+		)
+
+		return false
 	}
 
 	const instance = registry.match(

@@ -1,12 +1,16 @@
+import { MessageFlags } from "discord.js"
+import { componentRegistry } from "@/core/components/registry"
 import { TIMEOUT_MS } from "@/shared/constants/pagination"
 import {
 	applyStaticButtonState,
 	buildStaticActionRow,
 	buildStaticButtons,
 } from "@/shared/pagination/buttons"
-import { createPaginationCollector } from "@/shared/pagination/collector"
-import { buildPaginationIds } from "@/shared/pagination/ids"
-import { promptForSearch } from "@/shared/pagination/search-modal"
+import { buildPaginationIds, PAGINATION_FEATURE } from "@/shared/pagination/ids"
+import {
+	findSearchPage,
+	showSearchModal,
+} from "@/shared/pagination/search-modal"
 import type { StaticPaginationParams } from "@/shared/pagination/types"
 
 export async function paginateStatic({
@@ -71,32 +75,19 @@ export async function paginateStatic({
 		})
 	}
 
-	createPaginationCollector({
+	componentRegistry.openView({
+		feature: PAGINATION_FEATURE,
+		sessionId: ids.sessionId,
 		ownerId: interaction.user.id,
 		message,
 		time,
-		onCollect: async (buttonInteraction, { resetTimer }) => {
+		onButton: async (buttonInteraction, { resetTimer }) => {
 			resetTimer()
 
 			if (buttonInteraction.customId === ids.search) {
-				if (!search) {
-					return
+				if (search) {
+					await showSearchModal({ buttonInteraction, ids, search })
 				}
-
-				const outcome = await promptForSearch({
-					buttonInteraction,
-					ownerId: interaction.user.id,
-					ids,
-					search,
-					time,
-				})
-
-				if (outcome.kind === "switched") {
-					index = outcome.pageIndex
-
-					await render()
-				}
-
 				return
 			}
 
@@ -105,6 +96,26 @@ export async function paginateStatic({
 			if (changePage(buttonInteraction.customId)) {
 				await render()
 			}
+		},
+		onModal: async (modalInteraction) => {
+			if (!search || modalInteraction.customId !== ids.modal) {
+				return
+			}
+
+			const query = modalInteraction.fields.getTextInputValue(ids.input)
+			const pageIndex = findSearchPage(search.terms, query)
+
+			if (pageIndex === null) {
+				await modalInteraction.reply({
+					content: search.notFoundMessage,
+					flags: MessageFlags.Ephemeral,
+				})
+				return
+			}
+
+			await modalInteraction.deferUpdate()
+			index = pageIndex
+			await render()
 		},
 	})
 

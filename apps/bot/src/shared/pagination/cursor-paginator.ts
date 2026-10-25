@@ -1,11 +1,11 @@
+import { componentRegistry } from "@/core/components/registry"
 import { TIMEOUT_MS } from "@/shared/constants/pagination"
 import {
 	applyCursorButtonState,
 	buildCursorActionRow,
 	buildCursorButtons,
 } from "@/shared/pagination/buttons"
-import { createPaginationCollector } from "@/shared/pagination/collector"
-import { buildPaginationIds } from "@/shared/pagination/ids"
+import { buildPaginationIds, PAGINATION_FEATURE } from "@/shared/pagination/ids"
 import type {
 	CursorPage,
 	CursorPaginationParams,
@@ -67,11 +67,13 @@ export async function paginateCursor<T>({
 		})
 	}
 
-	createPaginationCollector({
+	componentRegistry.openView({
+		feature: PAGINATION_FEATURE,
+		sessionId: ids.sessionId,
 		ownerId: interaction.user.id,
 		message,
 		time,
-		onCollect: async (buttonInteraction, { resetTimer, stop }) => {
+		onButton: async (buttonInteraction, { resetTimer, stop }) => {
 			if (loading) {
 				await buttonInteraction.deferUpdate()
 				return

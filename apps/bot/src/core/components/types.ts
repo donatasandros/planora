@@ -34,12 +34,7 @@ export type OpenViewOptions = {
 	message: Message
 	time: number
 	onButton?: ButtonHandler
-}
-
-export type AwaitModalOptions = {
-	buttonInteraction: ButtonInteraction
-	customId: string
-	time: number
+	onModal?: ModalHandler
 }
 
 export type ViewHandle = {
@@ -47,8 +42,7 @@ export type ViewHandle = {
 	sessionId: string
 	ownerId: string
 	closed: boolean
-	awaitModal: (
-		options: AwaitModalOptions
-	) => Promise<ModalSubmitInteraction | null>
+	onModal?: ModalHandler
+	resetExpiry: () => void
 	close: () => Promise<void>
 }
