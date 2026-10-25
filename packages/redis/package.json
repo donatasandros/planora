@@ -17,9 +17,9 @@
 		"ioredis": "^6.0.0"
 	},
 	"devDependencies": {
-		"@turbo/gen": "^2.10.12",
-		"@types/node": "^26.4.1",
-		"tsdown": "^0.23.0",
+		"@turbo/gen": "^2.11.10",
+		"@types/node": "^26.6.5",
+		"tsdown": "0.23.1",
 		"typescript": "^7.0.2"
 	},
 	"exports": {

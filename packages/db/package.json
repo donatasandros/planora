@@ -18,15 +18,15 @@
 		"@workspace/env": "workspace:*",
 		"@workspace/logger": "workspace:*",
 		"drizzle-orm": "1.0.0-rc.4",
-		"pg": "^8.23.0",
-		"pg-native": "^3.9.0"
+		"pg": "^8.23.1",
+		"pg-native": "^3.9.1"
 	},
 	"devDependencies": {
-		"@turbo/gen": "^2.10.12",
-		"@types/node": "^26.4.1",
+		"@turbo/gen": "^2.11.10",
+		"@types/node": "^26.6.5",
 		"@types/pg": "^8.23.1",
 		"drizzle-kit": "1.0.0-rc.4",
-		"tsdown": "^0.23.0",
+		"tsdown": "0.23.1",
 		"typescript": "^7.0.2"
 	},
 	"exports": {

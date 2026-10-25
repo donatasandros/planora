@@ -1,12 +1,21 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.5.12/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": [
+			"**",
+			"!**/routeTree.gen.ts",
+			"!README.md",
+			"!docker-compose.yml",
+			"!promtail-config.yaml",
+			"!pnpm-workspace.yaml",
+			"!pnpm-lock.yaml"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -24,11 +33,8 @@
 				"useAwait": "off"
 			},
 			"nursery": {
-				"useSortedClasses": {
+				"useTailwindSortedClasses": {
 					"level": "warn",
-					"options": {
-						"functions": ["cn", "cva"]
-					},
 					"fix": "safe"
 				}
 			}
@@ -75,5 +81,6 @@
 				}
 			}
 		}
-	]
+	],
+	"tailwind": { "mergeFunctions": ["cn"], "variantFunctions": ["cva"] }
 }
