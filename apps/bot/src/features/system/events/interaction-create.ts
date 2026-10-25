@@ -2,7 +2,7 @@ import { Events } from "discord.js"
 import { dispatchComponent } from "@/core/components/dispatch"
 import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
-import { replyInteractionError } from "@/shared/utils/interaction"
+import { replyError } from "@/shared/discord/interaction"
 
 export const interactionCreateListeners = [
 	defineEvent(Events.InteractionCreate, {
@@ -60,7 +60,7 @@ export const interactionCreateListeners = [
 					"Command execution failed"
 				)
 
-				await replyInteractionError(interaction)
+				await replyError(interaction)
 			}
 		},
 	}),

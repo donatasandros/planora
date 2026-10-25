@@ -9,13 +9,22 @@ export class FakeChatInputCommandInteraction {
 	readonly replies: MessagePayload[] = []
 	readonly followUps: MessagePayload[] = []
 	readonly deferReplies: MessagePayload[] = []
+	readonly guild: { id: string } | null
 	createdTimestamp = 1_700_000_000_000
 	deferred = false
 	replied = false
 
-	constructor(options: { userId?: string; message?: FakeMessage } = {}) {
+	constructor(
+		options: {
+			userId?: string
+			message?: FakeMessage
+			guildId?: string | null
+		} = {}
+	) {
 		this.user = { id: options.userId ?? "user-1" }
 		this.message = options.message ?? new FakeMessage()
+		this.guild =
+			options.guildId === null ? null : { id: options.guildId ?? "guild-1" }
 	}
 
 	async editReply(payload: MessagePayload): Promise<FakeMessage> {

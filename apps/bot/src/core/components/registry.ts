@@ -15,7 +15,7 @@ import type {
 } from "@/core/components/types"
 import { loadFeatureModules } from "@/core/handlers/load-feature-modules"
 import { logger } from "@/core/logger"
-import { replyInteractionError } from "@/shared/utils/interaction"
+import { replyError } from "@/shared/discord/interaction"
 
 const OWNER_ONLY_MESSAGE =
 	"Only the original user can interact with this button."
@@ -72,7 +72,7 @@ export async function runComponentHandler(
 			"Component interaction handler failed"
 		)
 
-		await replyInteractionError(interaction)
+		await replyError(interaction)
 	}
 }
 

@@ -4,6 +4,7 @@ export type MessagePayload = {
 	embeds?: unknown[]
 	components?: unknown[]
 	content?: string
+	flags?: number
 }
 
 export class FakeMessage {

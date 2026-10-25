@@ -1,7 +1,7 @@
 import { type Client, Collection, Events } from "discord.js"
+import type { CommandModule } from "@/core/commands/types"
 import { loadFeatureModules } from "@/core/handlers/load-feature-modules"
 import { logger } from "@/core/logger"
-import type { CommandModule } from "@/core/types/discord.js"
 import { defineEvent } from "@/core/utils/define-event"
 
 export const clientReadyListeners = [

@@ -3,7 +3,6 @@ import {
 	type ChatInputCommandInteraction,
 	type Client,
 	EmbedBuilder,
-	MessageFlags,
 	SlashCommandBuilder,
 } from "discord.js"
 import { logger } from "@/core/logger"
@@ -14,6 +13,7 @@ import { formatActivityRow } from "@/features/activity/utils/formatting"
 import { resolveProfileVisibility } from "@/features/system"
 import { COLORS } from "@/shared/constants/colors"
 import { ITEMS_PER_PAGE } from "@/shared/constants/pagination"
+import { viewProfile } from "@/shared/discord/profile-view"
 import paginate from "@/shared/pagination"
 import { splitIntoChunks } from "@/shared/utils/array"
 import { formatTime } from "@/shared/utils/time"
@@ -138,29 +138,16 @@ export async function execute(
 	interaction: ChatInputCommandInteraction
 ) {
 	const user = interaction.options.getUser("user") ?? interaction.user
-	const visibility = await resolveProfileVisibility(
-		interaction.user.id,
-		user.id,
-		{
-			isDirectMessage: interaction.guild === null,
-		}
-	)
-
-	if (!visibility.allowed) {
-		return interaction.reply({
-			content:
-				visibility.reason === "private"
-					? `${user.username}'s profile is private.`
-					: visibility.reason === "unavailable"
-						? "Could not verify access to this profile, please try again later."
-						: `${user.username}'s profile is not available.`,
-			flags: MessageFlags.Ephemeral,
-		})
-	}
-
-	await interaction.deferReply({
-		flags: visibility.ephemeral ? MessageFlags.Ephemeral : undefined,
+	const view = await viewProfile({
+		interaction,
+		targetUserId: user.id,
+		targetUsername: user.username,
+		resolveVisibility: resolveProfileVisibility,
 	})
+
+	if (view.status === "denied") {
+		return
+	}
 
 	try {
 		const [pastActivities, currentActivities] = await Promise.all([

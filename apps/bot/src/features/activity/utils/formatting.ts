@@ -1,5 +1,5 @@
-import { discordTimestamp } from "@/shared/utils/discord"
 import { formatTime } from "@/shared/utils/time"
+import { discordTimestamp } from "@/shared/utils/timestamps"
 
 type ActivityRowOptions = {
 	durationSeconds?: number | null

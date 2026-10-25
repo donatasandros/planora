@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { discordTimestamp } from "@/shared/utils/discord"
+import { discordTimestamp } from "@/shared/utils/timestamps"
 
 describe("discordTimestamp", () => {
 	it("defaults to the relative style", () => {

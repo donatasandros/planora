@@ -1,5 +1,7 @@
 import { resolveUser } from "@/features/system/services/users"
-import type { ProfileVisibility } from "@/features/system/types"
+import type { ProfileVisibility, UserResolution } from "@/features/system/types"
+
+type ResolveUser = (userId: string) => Promise<UserResolution>
 
 export async function resolveProfileVisibility(
 	viewerId: string,
@@ -8,9 +10,10 @@ export async function resolveProfileVisibility(
 		isDirectMessage,
 	}: {
 		isDirectMessage: boolean
-	}
+	},
+	resolve: ResolveUser = resolveUser
 ): Promise<ProfileVisibility> {
-	const resolution = await resolveUser(targetId)
+	const resolution = await resolve(targetId)
 
 	if (resolution.kind === "unavailable") {
 		return { allowed: false, reason: "unavailable" }
