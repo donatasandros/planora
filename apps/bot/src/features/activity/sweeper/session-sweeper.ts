@@ -11,6 +11,7 @@ import {
 	finishActivitySession,
 	setActiveSessions,
 } from "@/features/activity/services/sessions"
+import { partitionStaleSessions } from "@/features/activity/sweeper/partition-sessions"
 import type {
 	ActiveActivitySessions,
 	SessionSweeper,
@@ -22,15 +23,6 @@ const SWEEP_USER_LOCK_TTL_SECONDS = 30
 
 const STALE_SESSION_SECONDS = 15 * 60 // 15 minutes
 const ACTIVE_SESSION_PATTERN = `${ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX}*`
-
-function hasStaleSessions(
-	sessions: ActiveActivitySessions,
-	now: number
-): boolean {
-	return Object.values(sessions).some(
-		(session) => now - session.lastSeenAt > STALE_SESSION_SECONDS
-	)
-}
 
 async function sweepStaleSessions(): Promise<void> {
 	const lockToken = await acquireLock(
@@ -59,7 +51,13 @@ async function sweepStaleSessions(): Promise<void> {
 
 				const now = Math.floor(Date.now() / 1000)
 
-				if (!hasStaleSessions(snapshot, now)) {
+				const snapshotPartition = partitionStaleSessions(
+					snapshot,
+					now,
+					STALE_SESSION_SECONDS
+				)
+
+				if (snapshotPartition.stale.length === 0) {
 					continue
 				}
 
@@ -83,23 +81,17 @@ async function sweepStaleSessions(): Promise<void> {
 						continue
 					}
 
-					const entries = Object.entries(sessions)
-
-					const staleEntries = entries.filter(
-						([_, session]) =>
-							now - session.lastSeenAt > STALE_SESSION_SECONDS
+					const { stale, active } = partitionStaleSessions(
+						sessions,
+						now,
+						STALE_SESSION_SECONDS
 					)
 
-					if (staleEntries.length === 0) {
+					if (stale.length === 0) {
 						continue
 					}
 
-					const activeEntries = entries.filter(
-						([_, session]) =>
-							now - session.lastSeenAt <= STALE_SESSION_SECONDS
-					)
-
-					for (const [_, session] of staleEntries) {
+					for (const [, session] of stale) {
 						const duration = Math.max(
 							0,
 							session.lastSeenAt - session.startedAt
@@ -121,11 +113,8 @@ async function sweepStaleSessions(): Promise<void> {
 						)
 					}
 
-					if (activeEntries.length > 0) {
-						await setActiveSessions(
-							userId,
-							Object.fromEntries(activeEntries)
-						)
+					if (Object.keys(active).length > 0) {
+						await setActiveSessions(userId, active)
 					} else {
 						await deleteKey(key)
 					}

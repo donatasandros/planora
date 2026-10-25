@@ -5,7 +5,7 @@ import { logger } from "@/core/logger"
 import {
 	enqueueSessionFinish,
 	enqueueSessionStart,
-} from "@/features/activity/services/session-batch"
+} from "@/features/activity/services/session-writes"
 import type {
 	ActiveActivitySession,
 	ActiveActivitySessions,
