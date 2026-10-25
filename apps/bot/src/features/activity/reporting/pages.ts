@@ -107,8 +107,18 @@ export function buildActivityPages(
 		)
 	}
 
+	if (embeds.length === 1) {
+		return {
+			embeds,
+			searchTerms,
+		}
+	}
+
 	return {
-		embeds,
+		embeds: embeds.map((embed, index) => ({
+			...embed,
+			footer: { text: `Page ${index + 1} / ${embeds.length}` },
+		})),
 		searchTerms,
 	}
 }

@@ -65,6 +65,24 @@ describe("buildActivityPages", () => {
 		])
 		expect(pages.embeds[0]?.description).toContain("Current activities:")
 		expect(pages.embeds[0]?.description).toContain("All activities:")
+		expect(pages.embeds.map((embed) => embed.footer?.text)).toEqual([
+			"Page 1 / 2",
+			"Page 2 / 2",
+		])
+	})
+
+	it("numbers every page when there are multiple pages", () => {
+		const pastActivities = Array.from({ length: 30 }, (_, index) =>
+			makeTotal(`Activity ${index + 1}`, index)
+		)
+
+		const pages = buildActivityPages("user", pastActivities, [])
+
+		expect(pages.embeds.map((embed) => embed.footer?.text)).toEqual([
+			"Page 1 / 3",
+			"Page 2 / 3",
+			"Page 3 / 3",
+		])
 	})
 
 	it("uses the full row budget when there are no current activities", () => {
@@ -84,7 +102,15 @@ describe("buildActivityPages", () => {
 
 		expect(pages.embeds).toHaveLength(1)
 		expect(pages.embeds[0]?.description).toContain("*No activities tracked.*")
+		expect(pages.embeds[0]?.footer).toBeUndefined()
 		expect(pages.searchTerms).toEqual([""])
+	})
+
+	it("does not add a footer when there is only one page", () => {
+		const pages = buildActivityPages("user", [makeTotal("Game", 0)], [])
+
+		expect(pages.embeds).toHaveLength(1)
+		expect(pages.embeds[0]?.footer).toBeUndefined()
 	})
 })
 
