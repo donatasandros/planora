@@ -11,6 +11,7 @@ export const env = createEnv({
 			.default("development"),
 		REDIS_URL: z.url(),
 		DISCORD_BOT_TOKEN: z.string().trim().min(1),
+		DISCORD_DEV_GUILD_ID: z.string().trim().min(1).optional(),
 	},
 	runtimeEnv: process.env,
 	emptyStringAsUndefined: true,
