@@ -18,7 +18,7 @@
 	"dependencies": {
 		"@workspace/env": "workspace:*",
 		"@workspace/logger": "workspace:*",
-		"drizzle-orm": "1.0.0-rc.4",
+		"drizzle-orm": "1.0.0-rc.5-ab785fc",
 		"pg": "^8.23.1",
 		"pg-native": "^3.9.1"
 	},
@@ -26,7 +26,7 @@
 		"@turbo/gen": "catalog:",
 		"@types/node": "catalog:",
 		"@types/pg": "^8.23.1",
-		"drizzle-kit": "1.0.0-rc.4",
+		"drizzle-kit": "1.0.0-rc.5-ab785fc",
 		"tsdown": "catalog:",
 		"typescript": "catalog:"
 	},
