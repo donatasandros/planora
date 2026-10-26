@@ -21,6 +21,7 @@ COPY --from=prepare /app/out/json/ .
 RUN pnpm install --frozen-lockfile
 
 COPY --from=prepare /app/out/full/ .
+COPY --from=prepare /app/tsconfig.base.json ./
 
 RUN pnpm turbo build
 
