@@ -10,6 +10,7 @@
 		"format": "biome format --write .",
 		"generate": "drizzle-kit generate",
 		"lint": "biome check .",
+		"migrate": "drizzle-kit migrate",
 		"push": "drizzle-kit push",
 		"studio": "drizzle-kit studio",
 		"typecheck": "tsc --noEmit"
