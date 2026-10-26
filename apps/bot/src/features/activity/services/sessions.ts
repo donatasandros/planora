@@ -1,7 +1,12 @@
 import { activitySessionsTable, and, db, eq, isNull, lt } from "@workspace/db"
 import { deleteKey, getJsonStrict, setJsonStrict } from "@workspace/redis"
-import type { Activity, ChatInputCommandInteraction } from "discord.js"
+import {
+	type Activity,
+	ActivityType,
+	type ChatInputCommandInteraction,
+} from "discord.js"
 import { logger } from "@/core/logger"
+import { TRACK_CUSTOM_ACTIVITIES } from "@/features/activity/constants"
 import { parseActiveSessions } from "@/features/activity/schemas/session"
 import {
 	enqueueSessionFinish,
@@ -21,6 +26,10 @@ import {
 
 const ACTIVE_SESSION_TTL_SECONDS = 7 * 24 * 60 * 60 // 7 days
 
+function isTrackedActivity(activity: Activity): boolean {
+	return TRACK_CUSTOM_ACTIVITIES || activity.type !== ActivityType.Custom
+}
+
 export async function getCurrentActivities(
 	interaction: ChatInputCommandInteraction,
 	userId: string
@@ -28,7 +37,7 @@ export async function getCurrentActivities(
 	const presence = interaction.guild?.presences.cache.get(userId)
 
 	if (presence) {
-		return presence.activities.map((activity) => ({
+		return presence.activities.filter(isTrackedActivity).map((activity) => ({
 			activityName: activity.name,
 			startedAt:
 				activity.timestamps?.start instanceof Date
@@ -39,10 +48,12 @@ export async function getCurrentActivities(
 
 	const activeSessions = await getActiveSessions(userId)
 
-	return Object.values(activeSessions).map((session) => ({
-		activityName: session.activityName,
-		startedAt: session.startedAt,
-	}))
+	return Object.values(activeSessions)
+		.filter((session) => TRACK_CUSTOM_ACTIVITIES || !session.isCustom)
+		.map((session) => ({
+			activityName: session.activityName,
+			startedAt: session.startedAt,
+		}))
 }
 
 export async function getActiveSessions(
