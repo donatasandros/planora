@@ -8,6 +8,7 @@
 		"LOG_LEVEL"
 	],
 	"ui": "tui",
+	"globalDependencies": ["tsconfig.base.json"],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],

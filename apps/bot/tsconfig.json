@@ -1,19 +1,12 @@
 {
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"target": "ES2024",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
 		"paths": {
 			"@/*": ["./src/*"]
 		},
 		"rootDir": "./src",
-		"outDir": "./dist",
-		"resolveJsonModule": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"customConditions": ["development"]
+		"outDir": "./dist"
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules"]
