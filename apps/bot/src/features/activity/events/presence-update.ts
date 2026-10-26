@@ -6,8 +6,8 @@ import {
 	setJson,
 } from "@workspace/redis"
 import { Events } from "discord.js"
+import { defineEvent } from "@/core/events/define-event"
 import { logger } from "@/core/logger"
-import { defineEvent } from "@/core/utils/define-event"
 import {
 	ACTIVITY_REDIS_KEYS,
 	TRACK_CUSTOM_ACTIVITIES,

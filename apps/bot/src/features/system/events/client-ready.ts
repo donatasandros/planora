@@ -1,7 +1,7 @@
 import { type Client, Events } from "discord.js"
 import { registerCommands } from "@/core/commands/registry"
+import { defineEvent } from "@/core/events/define-event"
 import { logger } from "@/core/logger"
-import { defineEvent } from "@/core/utils/define-event"
 
 export const clientReadyListeners = [
 	defineEvent(Events.ClientReady, {

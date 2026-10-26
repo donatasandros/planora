@@ -2,8 +2,8 @@ import { claim } from "@workspace/redis"
 import { Events } from "discord.js"
 import { isOnCooldown } from "@/core/commands/cooldown"
 import { dispatchComponent } from "@/core/components/dispatch"
+import { defineEvent } from "@/core/events/define-event"
 import { logger } from "@/core/logger"
-import { defineEvent } from "@/core/utils/define-event"
 import { replyCooldown, replyError } from "@/shared/discord/interaction"
 
 export const interactionCreateListeners = [
