@@ -71,12 +71,24 @@ export async function setJson(
 	}
 }
 
+export async function setJsonStrict(
+	key: string,
+	value: unknown,
+	ttlSeconds: number
+): Promise<void> {
+	await redis.set(key, JSON.stringify(value), "EX", ttlSeconds)
+}
+
 export async function deleteKey(key: string): Promise<void> {
 	try {
 		await redis.del(key)
 	} catch (err) {
 		logger.warn({ err, key }, "Redis key deletion failed")
 	}
+}
+
+export async function deleteKeyStrict(key: string): Promise<void> {
+	await redis.del(key)
 }
 
 export async function acquireLock(

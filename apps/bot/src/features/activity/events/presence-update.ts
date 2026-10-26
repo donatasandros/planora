@@ -1,4 +1,10 @@
-import { acquireLock, claim, deleteKey, releaseLock } from "@workspace/redis"
+import {
+	acquireLock,
+	claim,
+	deleteKey,
+	deleteKeyStrict,
+	releaseLock,
+} from "@workspace/redis"
 import { Events } from "discord.js"
 import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
@@ -109,7 +115,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 						await finishActivitySession(session.id, now, duration)
 					}
 
-					await deleteKey(activeSessionsKey)
+					await deleteKeyStrict(activeSessionsKey)
 				}
 
 				fingerprintMemo.remember(userId, fingerprintHash)
@@ -165,7 +171,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 			if (Object.keys(nextSessions).length > 0) {
 				await setActiveSessions(userId, nextSessions)
 			} else {
-				await deleteKey(activeSessionsKey)
+				await deleteKeyStrict(activeSessionsKey)
 			}
 
 			fingerprintMemo.remember(userId, fingerprintHash)

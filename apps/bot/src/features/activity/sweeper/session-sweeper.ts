@@ -1,6 +1,6 @@
 import {
 	acquireLock,
-	deleteKey,
+	deleteKeyStrict,
 	getJson,
 	releaseLock,
 	scanKeys,
@@ -116,7 +116,7 @@ async function sweepStaleSessions(): Promise<void> {
 					if (Object.keys(active).length > 0) {
 						await setActiveSessions(userId, active)
 					} else {
-						await deleteKey(key)
+						await deleteKeyStrict(key)
 					}
 				} finally {
 					await releaseLock(userLockKey, userLockToken)

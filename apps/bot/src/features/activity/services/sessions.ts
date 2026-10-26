@@ -1,5 +1,5 @@
 import { activitySessionsTable, and, db, eq, isNull } from "@workspace/db"
-import { deleteKey, getJsonStrict, setJson } from "@workspace/redis"
+import { deleteKey, getJsonStrict, setJsonStrict } from "@workspace/redis"
 import type { Activity, ChatInputCommandInteraction } from "discord.js"
 import { logger } from "@/core/logger"
 import { parseActiveSessions } from "@/features/activity/schemas/session"
@@ -78,7 +78,7 @@ export async function setActiveSessions(
 	userId: string,
 	sessions: ActiveActivitySessions
 ): Promise<void> {
-	await setJson(
+	await setJsonStrict(
 		getActiveSessionsKey(userId),
 		sessions,
 		ACTIVE_SESSION_TTL_SECONDS
