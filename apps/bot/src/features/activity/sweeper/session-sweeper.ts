@@ -20,7 +20,7 @@ import {
 import { recoverOrphanedSessions } from "@/features/activity/sweeper/orphan-recovery"
 import { partitionStaleSessions } from "@/features/activity/sweeper/partition-sessions"
 import { planUserSweep } from "@/features/activity/sweeper/plan-user-sweep"
-import { createPresenceLookup } from "@/features/activity/sweeper/presence-lookup"
+import { createPresenceLookup } from "@/features/activity/tracking/presence-lookup"
 import type {
 	ActiveActivitySessions,
 	SessionSweeper,
@@ -94,7 +94,7 @@ async function sweepStaleSessions(client: Client): Promise<void> {
 
 					const plan = planUserSweep({
 						sessions,
-						activities: presenceFor(userId),
+						activities: presenceFor(userId)?.activities,
 						trackCustom: TRACK_CUSTOM_ACTIVITIES,
 						now,
 						staleSeconds: STALE_SESSION_SECONDS,

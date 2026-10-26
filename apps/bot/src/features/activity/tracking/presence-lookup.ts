@@ -1,6 +1,6 @@
-import type { Activity, Client } from "discord.js"
+import type { Client, Presence } from "discord.js"
 
-export type PresenceLookup = (userId: string) => Activity[] | undefined
+export type PresenceLookup = (userId: string) => Presence | undefined
 
 export function createPresenceLookup(client: Client): PresenceLookup {
 	return (userId: string) => {
@@ -8,7 +8,7 @@ export function createPresenceLookup(client: Client): PresenceLookup {
 			const presence = guild.presences.cache.get(userId)
 
 			if (presence) {
-				return presence.activities
+				return presence
 			}
 		}
 

@@ -26,12 +26,21 @@ import {
 	createLastFingerprintStore,
 	isDuplicatePresence,
 } from "@/features/activity/tracking/last-fingerprint"
+import { acquireLockWithRetry } from "@/features/activity/tracking/lock-retry"
+import { createPresenceLookup } from "@/features/activity/tracking/presence-lookup"
 import { reconcileSessions } from "@/features/activity/tracking/reconcile"
 import type { ActiveActivitySessions } from "@/features/activity/types"
 import { getActiveSessionsKey } from "@/features/activity/utils/activity"
 import { resolveUser } from "@/features/system"
 
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30
+
+const LOCK_RETRY_ATTEMPTS = 3
+const LOCK_RETRY_DELAY_MS = 200
+
+function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 const lastFingerprint = createLastFingerprintStore({
 	get: getJson,
@@ -40,7 +49,7 @@ const lastFingerprint = createLastFingerprintStore({
 
 export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 	priority: 50,
-	async execute(_client, _oldPresence, newPresence) {
+	async execute(client, _oldPresence, newPresence) {
 		const userId = newPresence.userId
 
 		if (!userId) {
@@ -51,31 +60,50 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 			return
 		}
 
-		const fingerprint = getPresenceFingerprint(newPresence)
-		const fingerprintHash = hashFingerprint(fingerprint)
+		const presenceFor = createPresenceLookup(client)
+		const fingerprintHash = hashFingerprint(
+			getPresenceFingerprint(newPresence)
+		)
 
-		const lastProcessedHash = await lastFingerprint.read(userId)
-
-		if (isDuplicatePresence(lastProcessedHash, fingerprintHash)) {
+		if (
+			isDuplicatePresence(
+				await lastFingerprint.read(userId),
+				fingerprintHash
+			)
+		) {
 			return
 		}
 
 		const lockKey = ACTIVITY_REDIS_KEYS.USER_LOCK(userId)
-		const lockToken = await acquireLock(
-			lockKey,
-			USER_ACTIVITY_LOCK_TTL_SECONDS
-		)
+
+		const lockToken = await acquireLockWithRetry({
+			acquire: () => acquireLock(lockKey, USER_ACTIVITY_LOCK_TTL_SECONDS),
+			attempts: LOCK_RETRY_ATTEMPTS,
+			delayMs: LOCK_RETRY_DELAY_MS,
+			sleep,
+		})
 
 		if (!lockToken) {
-			logger.debug(
+			logger.warn(
 				{ userId },
-				"Skipped presence update because user is locked"
+				"Dropped presence update, user lock stayed held"
 			)
 
 			return
 		}
 
 		try {
+			const latestPresence = presenceFor(userId) ?? newPresence
+			const latestHash = hashFingerprint(
+				getPresenceFingerprint(latestPresence)
+			)
+
+			if (
+				isDuplicatePresence(await lastFingerprint.read(userId), latestHash)
+			) {
+				return
+			}
+
 			const [userResolution, previousSessions] = await Promise.all([
 				resolveUser(userId),
 				getActiveSessions(userId),
@@ -104,14 +132,14 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 					await deleteKeyStrict(activeSessionsKey)
 				}
 
-				await lastFingerprint.commit(userId, fingerprintHash)
+				await lastFingerprint.commit(userId, latestHash)
 
 				return
 			}
 
 			const { started, kept, ended } = reconcileSessions({
 				previous: previousSessions,
-				activities: newPresence.activities,
+				activities: latestPresence.activities,
 				trackCustom: TRACK_CUSTOM_ACTIVITIES,
 				now,
 			})
@@ -160,7 +188,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 				await deleteKeyStrict(activeSessionsKey)
 			}
 
-			await lastFingerprint.commit(userId, fingerprintHash)
+			await lastFingerprint.commit(userId, latestHash)
 		} finally {
 			await releaseLock(lockKey, lockToken)
 		}
