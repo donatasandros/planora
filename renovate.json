@@ -1,0 +1,21 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended", ":dependencyDashboard"],
+	"timezone": "Europe/Vilnius",
+	"schedule": ["before 9am on monday"],
+	"lockFileMaintenance": {
+		"enabled": true,
+		"schedule": ["before 9am on the first day of the month"]
+	},
+	"packageRules": [
+		{
+			"matchDepTypes": ["devDependencies"],
+			"groupName": "dev dependencies"
+		},
+		{
+			"matchPackageNames": ["tsdown"],
+			"allowedVersions": "<=0.23.1",
+			"description": "0.23.2 pulls rolldown-plugin-dts 0.29 beta, which requires the classic TS API. Remove this pin when upstream supports TS 7."
+		}
+	]
+}
