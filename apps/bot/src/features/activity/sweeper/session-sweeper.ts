@@ -5,8 +5,12 @@ import {
 	releaseLock,
 	scanKeys,
 } from "@workspace/redis"
+import type { Client } from "discord.js"
 import { logger } from "@/core/logger"
-import { ACTIVITY_REDIS_KEYS } from "@/features/activity/constants"
+import {
+	ACTIVITY_REDIS_KEYS,
+	TRACK_CUSTOM_ACTIVITIES,
+} from "@/features/activity/constants"
 import {
 	findOpenSessions,
 	finishActivitySession,
@@ -15,6 +19,8 @@ import {
 } from "@/features/activity/services/sessions"
 import { recoverOrphanedSessions } from "@/features/activity/sweeper/orphan-recovery"
 import { partitionStaleSessions } from "@/features/activity/sweeper/partition-sessions"
+import { planUserSweep } from "@/features/activity/sweeper/plan-user-sweep"
+import { createPresenceLookup } from "@/features/activity/sweeper/presence-lookup"
 import type {
 	ActiveActivitySessions,
 	SessionSweeper,
@@ -27,7 +33,9 @@ const SWEEP_USER_LOCK_TTL_SECONDS = 30
 const STALE_SESSION_SECONDS = 15 * 60 // 15 minutes
 const ACTIVE_SESSION_PATTERN = `${ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX}*`
 
-async function sweepStaleSessions(): Promise<void> {
+async function sweepStaleSessions(client: Client): Promise<void> {
+	const presenceFor = createPresenceLookup(client)
+
 	const lockToken = await acquireLock(
 		ACTIVITY_REDIS_KEYS.SWEEP_LOCK,
 		SWEEP_LOCK_TTL_SECONDS
@@ -84,40 +92,33 @@ async function sweepStaleSessions(): Promise<void> {
 						continue
 					}
 
-					const { stale, active } = partitionStaleSessions(
+					const plan = planUserSweep({
 						sessions,
+						activities: presenceFor(userId),
+						trackCustom: TRACK_CUSTOM_ACTIVITIES,
 						now,
-						STALE_SESSION_SECONDS
-					)
+						staleSeconds: STALE_SESSION_SECONDS,
+					})
 
-					if (stale.length === 0) {
+					if (plan.refreshed === 0 && plan.finish.length === 0) {
 						continue
 					}
 
-					for (const [, session] of stale) {
-						const duration = Math.max(
-							0,
-							session.lastSeenAt - session.startedAt
-						)
-
+					for (const item of plan.finish) {
 						await finishActivitySession(
-							session.id,
-							session.lastSeenAt,
-							duration
+							item.id,
+							item.endedAt,
+							item.durationSeconds
 						)
 
 						logger.debug(
-							{
-								userId,
-								sessionId: session.id,
-								activity: session.activityName,
-							},
+							{ userId, sessionId: item.id },
 							"Sweep stale activity session"
 						)
 					}
 
-					if (Object.keys(active).length > 0) {
-						await setActiveSessions(userId, active)
+					if (Object.keys(plan.keep).length > 0) {
+						await setActiveSessions(userId, plan.keep)
 					} else {
 						await deleteKeyStrict(key)
 					}
@@ -154,7 +155,7 @@ async function sweepStaleSessions(): Promise<void> {
 	}
 }
 
-export function startSessionSweeperWorker(): SessionSweeper {
+export function startSessionSweeperWorker(client: Client): SessionSweeper {
 	let inFlight: Promise<void> | undefined
 	let stopped = false
 
@@ -163,7 +164,7 @@ export function startSessionSweeperWorker(): SessionSweeper {
 			return
 		}
 
-		inFlight = sweepStaleSessions()
+		inFlight = sweepStaleSessions(client)
 			.catch((err) => {
 				logger.error(
 					{ err },

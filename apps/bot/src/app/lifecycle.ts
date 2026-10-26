@@ -82,7 +82,7 @@ export function createLifecycle(client: Client) {
 			await registerEvents(client)
 			await client.login(env.DISCORD_BOT_TOKEN)
 
-			sweeper = startSessionSweeperWorker()
+			sweeper = startSessionSweeperWorker(client)
 		} catch (err) {
 			logger.error({ err }, "Error during bot startup")
 
