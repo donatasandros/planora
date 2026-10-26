@@ -1,9 +1,9 @@
 import {
 	acquireLock,
-	claim,
-	deleteKey,
 	deleteKeyStrict,
+	getJson,
 	releaseLock,
+	setJson,
 } from "@workspace/redis"
 import { Events } from "discord.js"
 import { logger } from "@/core/logger"
@@ -19,25 +19,24 @@ import {
 	startActivitySession,
 } from "@/features/activity/services/sessions"
 import {
-	createFingerprintMemo,
 	getPresenceFingerprint,
 	hashFingerprint,
 } from "@/features/activity/tracking/fingerprint"
+import {
+	createLastFingerprintStore,
+	isDuplicatePresence,
+} from "@/features/activity/tracking/last-fingerprint"
 import { reconcileSessions } from "@/features/activity/tracking/reconcile"
 import type { ActiveActivitySessions } from "@/features/activity/types"
 import { getActiveSessionsKey } from "@/features/activity/utils/activity"
 import { resolveUser } from "@/features/system"
 
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30
-const PRESENCE_DEDUPLICATION_TTL_SECONDS = 10
 
-const FINGERPRINT_MEMO_TTL_MS = 10 * 1000 // 10 seconds
-const FINGERPRINT_MEMO_MAX_ENTRIES = 50_000
-
-const fingerprintMemo = createFingerprintMemo(
-	FINGERPRINT_MEMO_TTL_MS,
-	FINGERPRINT_MEMO_MAX_ENTRIES
-)
+const lastFingerprint = createLastFingerprintStore({
+	get: getJson,
+	set: setJson,
+})
 
 export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 	priority: 50,
@@ -55,20 +54,9 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 		const fingerprint = getPresenceFingerprint(newPresence)
 		const fingerprintHash = hashFingerprint(fingerprint)
 
-		const deduplicationKey = ["presence:event", userId, fingerprintHash].join(
-			":"
-		)
+		const lastProcessedHash = await lastFingerprint.read(userId)
 
-		if (fingerprintMemo.isMemoized(userId, fingerprintHash)) {
-			return
-		}
-
-		const shouldProcess = await claim(
-			deduplicationKey,
-			PRESENCE_DEDUPLICATION_TTL_SECONDS
-		)
-
-		if (!shouldProcess) {
+		if (isDuplicatePresence(lastProcessedHash, fingerprintHash)) {
 			return
 		}
 
@@ -83,8 +71,6 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 				{ userId },
 				"Skipped presence update because user is locked"
 			)
-
-			await deleteKey(deduplicationKey)
 
 			return
 		}
@@ -118,7 +104,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 					await deleteKeyStrict(activeSessionsKey)
 				}
 
-				fingerprintMemo.remember(userId, fingerprintHash)
+				await lastFingerprint.commit(userId, fingerprintHash)
 
 				return
 			}
@@ -174,7 +160,7 @@ export const trackPresenceListener = defineEvent(Events.PresenceUpdate, {
 				await deleteKeyStrict(activeSessionsKey)
 			}
 
-			fingerprintMemo.remember(userId, fingerprintHash)
+			await lastFingerprint.commit(userId, fingerprintHash)
 		} finally {
 			await releaseLock(lockKey, lockToken)
 		}
