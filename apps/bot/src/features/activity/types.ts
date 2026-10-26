@@ -14,6 +14,13 @@ export type ActiveActivitySession = {
 
 export type ActiveActivitySessions = Record<string, ActiveActivitySession>
 
+export type OpenSessionRow = {
+	id: string
+	userId: string
+	activityKey: string
+	startedAt: number
+}
+
 export type CurrentActivity = {
 	activityName: string
 	startedAt: number | null

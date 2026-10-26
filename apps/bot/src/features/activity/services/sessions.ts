@@ -1,4 +1,4 @@
-import { activitySessionsTable, and, db, eq, isNull } from "@workspace/db"
+import { activitySessionsTable, and, db, eq, isNull, lt } from "@workspace/db"
 import { deleteKey, getJsonStrict, setJsonStrict } from "@workspace/redis"
 import type { Activity, ChatInputCommandInteraction } from "discord.js"
 import { logger } from "@/core/logger"
@@ -11,6 +11,7 @@ import type {
 	ActiveActivitySession,
 	ActiveActivitySessions,
 	CurrentActivity,
+	OpenSessionRow,
 } from "@/features/activity/types"
 import {
 	buildActivitySession,
@@ -72,6 +73,31 @@ export async function getActiveSessions(
 	}
 
 	return parsed.sessions
+}
+
+export async function findOpenSessions({
+	startedBefore,
+	limit,
+}: {
+	startedBefore: number
+	limit: number
+}): Promise<OpenSessionRow[]> {
+	return await db
+		.select({
+			id: activitySessionsTable.id,
+			userId: activitySessionsTable.userId,
+			activityKey: activitySessionsTable.activityKey,
+			startedAt: activitySessionsTable.startedAt,
+		})
+		.from(activitySessionsTable)
+		.where(
+			and(
+				isNull(activitySessionsTable.endedAt),
+				lt(activitySessionsTable.startedAt, startedBefore)
+			)
+		)
+		.orderBy(activitySessionsTable.startedAt)
+		.limit(limit)
 }
 
 export async function setActiveSessions(

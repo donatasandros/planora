@@ -8,9 +8,12 @@ import {
 import { logger } from "@/core/logger"
 import { ACTIVITY_REDIS_KEYS } from "@/features/activity/constants"
 import {
+	findOpenSessions,
 	finishActivitySession,
+	getActiveSessions,
 	setActiveSessions,
 } from "@/features/activity/services/sessions"
+import { recoverOrphanedSessions } from "@/features/activity/sweeper/orphan-recovery"
 import { partitionStaleSessions } from "@/features/activity/sweeper/partition-sessions"
 import type {
 	ActiveActivitySessions,
@@ -122,6 +125,29 @@ async function sweepStaleSessions(): Promise<void> {
 					await releaseLock(userLockKey, userLockToken)
 				}
 			}
+		}
+
+		const recovery = await recoverOrphanedSessions({
+			findOpenSessions,
+			getActiveSessions,
+			finishSession: (input) =>
+				finishActivitySession(
+					input.id,
+					input.endedAt,
+					input.durationSeconds
+				),
+			acquireUserLock: async (userId) =>
+				acquireLock(
+					ACTIVITY_REDIS_KEYS.USER_LOCK(userId),
+					SWEEP_USER_LOCK_TTL_SECONDS
+				),
+			releaseUserLock: (userId, token) =>
+				releaseLock(ACTIVITY_REDIS_KEYS.USER_LOCK(userId), token),
+			now: Math.floor(Date.now() / 1000),
+		})
+
+		if (recovery.recovered > 0 || recovery.usersDegraded > 0) {
+			logger.warn(recovery, "Recovered orphaned activity sessions")
 		}
 	} finally {
 		await releaseLock(ACTIVITY_REDIS_KEYS.SWEEP_LOCK, lockToken)
