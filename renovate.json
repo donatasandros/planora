@@ -13,6 +13,11 @@
 			"groupName": "dev dependencies"
 		},
 		{
+			"matchPackageNames": ["drizzle-orm", "drizzle-kit"],
+			"groupName": "drizzle",
+			"description": "drizzle-kit must match drizzle-orm for generate/migrate; never bump one alone."
+		},
+		{
 			"matchPackageNames": ["tsdown"],
 			"allowedVersions": "<=0.23.1",
 			"description": "0.23.2 pulls rolldown-plugin-dts 0.29 beta, which requires the classic TS API. Remove this pin when upstream supports TS 7."
