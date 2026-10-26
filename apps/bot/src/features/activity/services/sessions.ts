@@ -1,7 +1,8 @@
 import { activitySessionsTable, and, db, eq, isNull } from "@workspace/db"
-import { getJsonStrict, setJson } from "@workspace/redis"
+import { deleteKey, getJsonStrict, setJson } from "@workspace/redis"
 import type { Activity, ChatInputCommandInteraction } from "discord.js"
 import { logger } from "@/core/logger"
+import { parseActiveSessions } from "@/features/activity/schemas/session"
 import {
 	enqueueSessionFinish,
 	enqueueSessionStart,
@@ -46,11 +47,31 @@ export async function getCurrentActivities(
 export async function getActiveSessions(
 	userId: string
 ): Promise<ActiveActivitySessions> {
-	return (
-		(await getJsonStrict<ActiveActivitySessions>(
-			getActiveSessionsKey(userId)
-		)) ?? {}
-	)
+	const key = getActiveSessionsKey(userId)
+	const raw = await getJsonStrict<unknown>(key)
+
+	if (raw === null) {
+		return {}
+	}
+
+	const parsed = parseActiveSessions(raw)
+
+	if (parsed.kind === "invalid") {
+		logger.warn({ userId }, "Discarding invalid active sessions payload")
+
+		await deleteKey(key)
+
+		return {}
+	}
+
+	if (parsed.dropped > 0) {
+		logger.warn(
+			{ userId, dropped: parsed.dropped },
+			"Dropped invalid active session entries"
+		)
+	}
+
+	return parsed.sessions
 }
 
 export async function setActiveSessions(

@@ -2,6 +2,7 @@ import { db, eq, usersTable } from "@workspace/db"
 import { claim, deleteKey, getJson, setJson } from "@workspace/redis"
 import { logger } from "@/core/logger"
 import { USER_REDIS_KEYS } from "@/features/system/constants"
+import { parseUser } from "@/features/system/schemas/user"
 import type { User, UserResolution } from "@/features/system/types"
 
 const USER_CACHE_TTL_SECONDS = 60
@@ -14,21 +15,6 @@ function createDefaultUser(userId: string): User {
 		isProfilePrivate: false,
 		isBlacklisted: false,
 	}
-}
-
-function isUser(value: unknown): value is User {
-	if (!value || typeof value !== "object") {
-		return false
-	}
-
-	const candidate = value as Record<string, unknown>
-
-	return (
-		typeof candidate.id === "string" &&
-		typeof candidate.isTrackingEnabled === "boolean" &&
-		typeof candidate.isProfilePrivate === "boolean" &&
-		typeof candidate.isBlacklisted === "boolean"
-	)
 }
 
 async function registerUserEventually(userId: string): Promise<void> {
@@ -61,8 +47,10 @@ export async function resolveUser(userId: string): Promise<UserResolution> {
 	const cached = await getJson<unknown>(cacheKey)
 
 	if (cached !== null) {
-		if (isUser(cached)) {
-			return { kind: "found", user: cached }
+		const cachedUser = parseUser(cached)
+
+		if (cachedUser) {
+			return { kind: "found", user: cachedUser }
 		}
 
 		logger.warn({ userId }, "Discarding invalid cached user record")
