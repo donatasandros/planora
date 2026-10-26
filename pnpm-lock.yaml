@@ -162,6 +162,45 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@tailwindcss/vite':
+      specifier: ^4.3.3
+      version: 4.3.3
+    '@turbo/gen':
+      specifier: ^2.11.10
+      version: 2.11.10
+    '@types/node':
+      specifier: ^24.19.2
+      version: 24.19.2
+    '@types/react':
+      specifier: ^19.2.18
+      version: 19.3.0
+    '@types/react-dom':
+      specifier: ^19.2.7
+      version: 19.3.0
+    lucide-react:
+      specifier: ^1.42.0
+      version: 1.45.0
+    react:
+      specifier: ^19.2.8
+      version: 19.3.0
+    react-dom:
+      specifier: ^19.2.8
+      version: 19.3.0
+    tailwindcss:
+      specifier: ^4.3.3
+      version: 4.3.3
+    tsdown:
+      specifier: 0.23.1
+      version: 0.23.1
+    typescript:
+      specifier: ^7.0.2
+      version: 7.0.2
+    zod:
+      specifier: ^4.6.7
+      version: 4.6.7
+
 importers:
 
   .:
@@ -173,47 +212,7 @@ importers:
         specifier: ^2.11.10
         version: 2.11.10
       typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
-
-  apps/bench:
-    dependencies:
-      '@workspace/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@workspace/env':
-        specifier: workspace:*
-        version: link:../../packages/env
-      '@workspace/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
-      '@workspace/redis':
-        specifier: workspace:*
-        version: link:../../packages/redis
-      discord.js:
-        specifier: ^14.27.0
-        version: 14.27.0
-      ioredis:
-        specifier: ^6.0.0
-        version: 6.0.0
-      pg:
-        specifier: ^8.23.1
-        version: 8.23.1(pg-native@3.9.1)
-      zod:
-        specifier: ^4.6.7
-        version: 4.6.7
-    devDependencies:
-      '@types/node':
-        specifier: ^26.6.5
-        version: 26.6.5
-      '@types/pg':
-        specifier: ^8.23.1
-        version: 8.23.1
-      tsx:
-        specifier: ^4.23.15
-        version: 4.23.15
-      typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
   apps/bot:
@@ -237,23 +236,23 @@ importers:
         specifier: ^3.3.3
         version: 3.3.3
       zod:
-        specifier: ^4.6.7
+        specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
       '@types/node':
-        specifier: ^24.19.2
+        specifier: 'catalog:'
         version: 24.19.2
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.19.2)(typescript@7.0.2)
       tsdown:
-        specifier: 0.23.1
+        specifier: 'catalog:'
         version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
       tsx:
         specifier: ^4.23.15
         version: 4.23.15
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
       vitest:
         specifier: ^5.0.5
@@ -262,7 +261,7 @@ importers:
   apps/web:
     dependencies:
       '@tailwindcss/vite':
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3(vite@8.3.0(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
       '@tanstack/react-devtools':
         specifier: latest
@@ -283,38 +282,38 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       lucide-react:
-        specifier: ^1.42.0
+        specifier: 'catalog:'
         version: 1.45.0(react@19.3.0)
       nitro:
         specifier: 3.0.260903-beta
         version: 3.0.260903-beta
       react:
-        specifier: ^19.2.8
+        specifier: 'catalog:'
         version: 19.3.0
       react-dom:
-        specifier: ^19.2.8
+        specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
       tailwindcss:
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3
     devDependencies:
       '@tanstack/devtools-vite':
         specifier: latest
         version: 0.8.5(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(vite@8.3.0(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
       '@types/node':
-        specifier: ^24.19.2
+        specifier: 'catalog:'
         version: 24.19.2
       '@types/react':
-        specifier: ^19.2.18
+        specifier: 'catalog:'
         version: 19.3.0
       '@types/react-dom':
-        specifier: ^19.2.7
+        specifier: 'catalog:'
         version: 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react':
         specifier: ^6.1.1
         version: 6.1.1(vite@8.3.0(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
       vite:
         specifier: ^8.2.2
@@ -339,10 +338,10 @@ importers:
         version: 3.9.1
     devDependencies:
       '@turbo/gen':
-        specifier: ^2.11.10
+        specifier: 'catalog:'
         version: 2.11.10(@types/node@24.19.2)
       '@types/node':
-        specifier: ^24.19.2
+        specifier: 'catalog:'
         version: 24.19.2
       '@types/pg':
         specifier: ^8.23.1
@@ -351,10 +350,10 @@ importers:
         specifier: 1.0.0-rc.4
         version: 1.0.0-rc.4
       tsdown:
-        specifier: 0.23.1
+        specifier: 'catalog:'
         version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
   packages/env:
@@ -363,20 +362,20 @@ importers:
         specifier: ^0.13.11
         version: 0.13.11(typescript@7.0.2)(zod@4.6.7)
       zod:
-        specifier: ^4.6.7
+        specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
       '@turbo/gen':
-        specifier: ^2.11.10
+        specifier: 'catalog:'
         version: 2.11.10(@types/node@24.19.2)
       '@types/node':
-        specifier: ^24.19.2
+        specifier: 'catalog:'
         version: 24.19.2
       tsdown:
-        specifier: 0.23.1
+        specifier: 'catalog:'
         version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
   packages/logger:
@@ -392,10 +391,10 @@ importers:
         version: 13.2.0
     devDependencies:
       tsdown:
-        specifier: 0.23.1
+        specifier: 'catalog:'
         version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
   packages/redis:
@@ -411,16 +410,16 @@ importers:
         version: 6.0.0
     devDependencies:
       '@turbo/gen':
-        specifier: ^2.11.10
+        specifier: 'catalog:'
         version: 2.11.10(@types/node@24.19.2)
       '@types/node':
-        specifier: ^24.19.2
+        specifier: 'catalog:'
         version: 24.19.2
       tsdown:
-        specifier: 0.23.1
+        specifier: 'catalog:'
         version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
   packages/ui:
@@ -438,13 +437,13 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       lucide-react:
-        specifier: ^1.42.0
+        specifier: 'catalog:'
         version: 1.45.0(react@19.3.0)
       react:
-        specifier: ^19.2.8
+        specifier: 'catalog:'
         version: 19.3.0
       react-dom:
-        specifier: ^19.2.8
+        specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
       shadcn:
         specifier: ^4.21.0
@@ -456,29 +455,29 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       zod:
-        specifier: ^4.6.7
+        specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
       '@tailwindcss/vite':
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3(vite@8.3.0(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
       '@turbo/gen':
-        specifier: ^2.11.10
+        specifier: 'catalog:'
         version: 2.11.10(@types/node@24.19.2)
       '@types/node':
-        specifier: ^24.19.2
+        specifier: 'catalog:'
         version: 24.19.2
       '@types/react':
-        specifier: ^19.2.18
+        specifier: 'catalog:'
         version: 19.3.0
       '@types/react-dom':
-        specifier: ^19.2.7
+        specifier: 'catalog:'
         version: 19.3.0(@types/react@19.3.0)
       tailwindcss:
-        specifier: ^4.3.3
+        specifier: 'catalog:'
         version: 4.3.3
       typescript:
-        specifier: ^7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
 packages:

@@ -19,8 +19,8 @@
 		"pino-pretty": "^13.2.0"
 	},
 	"devDependencies": {
-		"tsdown": "0.23.1",
-		"typescript": "^7.0.2"
+		"tsdown": "catalog:",
+		"typescript": "catalog:"
 	},
 	"exports": {
 		".": {

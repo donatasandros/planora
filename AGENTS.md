@@ -68,7 +68,7 @@ Run from the repo root unless noted.
 
 ## Deployment
 
-- `apps/bot/Dockerfile` and `apps/web/Dockerfile`: multi-stage, `turbo prune <app> --docker`, `pnpm install --frozen-lockfile`, `turbo build`, non-root runner. Dockerfiles use Node 24.15.0; CI uses Node 22.
+- `apps/bot/Dockerfile` and `apps/web/Dockerfile`: multi-stage, `turbo prune <app> --docker`, `pnpm install --frozen-lockfile`, `turbo build`, non-root runner. Dockerfiles and CI both use Node 24 (`.nvmrc`-free; `engines.node` is `>=24`).
 - `docker-compose.yml` (project name `planora`) runs `web`, `bot`, and `promtail` (ships container logs to Loki).
 - Bot command deployment happens at `ClientReady`; restarting the bot replaces the command payload. Global command changes can take up to an hour to propagate in Discord, guild commands are immediate.
 

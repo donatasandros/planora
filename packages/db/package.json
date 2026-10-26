@@ -22,12 +22,12 @@
 		"pg-native": "^3.9.1"
 	},
 	"devDependencies": {
-		"@turbo/gen": "^2.11.10",
-		"@types/node": "^24.19.2",
+		"@turbo/gen": "catalog:",
+		"@types/node": "catalog:",
 		"@types/pg": "^8.23.1",
 		"drizzle-kit": "1.0.0-rc.4",
-		"tsdown": "0.23.1",
-		"typescript": "^7.0.2"
+		"tsdown": "catalog:",
+		"typescript": "catalog:"
 	},
 	"exports": {
 		".": {
