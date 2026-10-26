@@ -1,4 +1,4 @@
-import { isNull } from "drizzle-orm"
+import { isNotNull, isNull } from "drizzle-orm"
 import {
 	bigint,
 	boolean,
@@ -39,12 +39,9 @@ export const activitySessionsTable = pgTable(
 			table.userId,
 			table.activityName
 		),
-		index("activity_sessions_user_history_idx").on(
-			table.userId,
-			table.endedAt,
-			table.startedAt,
-			table.id
-		),
+		index("activity_sessions_user_started_idx")
+			.on(table.userId, table.startedAt.desc(), table.id.desc())
+			.where(isNotNull(table.endedAt)),
 		uniqueIndex("activity_sessions_open_user_activity_ux")
 			.on(table.userId, table.activityKey)
 			.where(isNull(table.endedAt)),
