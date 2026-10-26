@@ -7,7 +7,7 @@ RUN corepack enable
 
 FROM base AS prepare
 WORKDIR /app
-RUN pnpm add --global turbo@2.10.12
+RUN pnpm add --global turbo@2.11.10
 COPY . .
 RUN turbo prune bot --docker
 
