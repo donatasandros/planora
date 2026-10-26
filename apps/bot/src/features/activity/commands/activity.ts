@@ -11,6 +11,8 @@ import { resolveProfileVisibility } from "@/features/system"
 import { viewProfile } from "@/shared/discord/profile-view"
 import paginate from "@/shared/pagination"
 
+export const cooldownSeconds = 5
+
 export const data = new SlashCommandBuilder()
 	.setName("activity")
 	.setDescription("View user activity statistics.")

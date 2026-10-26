@@ -4,6 +4,7 @@ export type InteractionUser = { id: string }
 
 export class FakeChatInputCommandInteraction {
 	readonly user: InteractionUser
+	readonly commandName: string
 	readonly message: FakeMessage
 	readonly editReplies: MessagePayload[] = []
 	readonly replies: MessagePayload[] = []
@@ -17,14 +18,20 @@ export class FakeChatInputCommandInteraction {
 	constructor(
 		options: {
 			userId?: string
+			commandName?: string
 			message?: FakeMessage
 			guildId?: string | null
 		} = {}
 	) {
 		this.user = { id: options.userId ?? "user-1" }
+		this.commandName = options.commandName ?? "activity"
 		this.message = options.message ?? new FakeMessage()
 		this.guild =
 			options.guildId === null ? null : { id: options.guildId ?? "guild-1" }
+	}
+
+	isChatInputCommand(): boolean {
+		return true
 	}
 
 	async editReply(payload: MessagePayload): Promise<FakeMessage> {

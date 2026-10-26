@@ -7,6 +7,7 @@ import type {
 
 export interface CommandModule {
 	data: SlashCommandBuilder
+	cooldownSeconds?: number
 	execute: (
 		client: BaseClient,
 		interaction: ChatInputCommandInteraction

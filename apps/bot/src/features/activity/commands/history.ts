@@ -13,6 +13,8 @@ import { COLORS } from "@/shared/constants/colors"
 import { viewProfile } from "@/shared/discord/profile-view"
 import paginate from "@/shared/pagination"
 
+export const cooldownSeconds = 5
+
 export const data = new SlashCommandBuilder()
 	.setName("history")
 	.setDescription("View activity session history.")

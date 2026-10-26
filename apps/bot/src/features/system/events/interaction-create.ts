@@ -1,8 +1,10 @@
+import { claim } from "@workspace/redis"
 import { Events } from "discord.js"
+import { isOnCooldown } from "@/core/commands/cooldown"
 import { dispatchComponent } from "@/core/components/dispatch"
 import { logger } from "@/core/logger"
 import { defineEvent } from "@/core/utils/define-event"
-import { replyError } from "@/shared/discord/interaction"
+import { replyCooldown, replyError } from "@/shared/discord/interaction"
 
 export const interactionCreateListeners = [
 	defineEvent(Events.InteractionCreate, {
@@ -28,6 +30,21 @@ export const interactionCreateListeners = [
 					},
 					"Received unregistered command interaction"
 				)
+				return
+			}
+
+			const cooldownSeconds = command.cooldownSeconds
+
+			if (
+				cooldownSeconds &&
+				(await isOnCooldown({
+					commandName: interaction.commandName,
+					userId: interaction.user.id,
+					cooldownSeconds,
+					claim,
+				}))
+			) {
+				await replyCooldown(interaction)
 				return
 			}
 

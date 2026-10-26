@@ -59,6 +59,7 @@ export async function registerCommands(client: Client): Promise<void> {
 
 		client.commands.set(command.data.name, {
 			data: command.data,
+			cooldownSeconds: command.cooldownSeconds,
 			execute: command.execute,
 		})
 
