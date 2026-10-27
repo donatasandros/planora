@@ -6,7 +6,14 @@ import {
 	type ChatInputCommandInteraction,
 } from "discord.js"
 import { logger } from "@/core/logger"
-import { TRACK_CUSTOM_ACTIVITIES } from "@/features/activity/constants"
+import {
+	ACTIVITY_REDIS_KEYS,
+	TRACK_CUSTOM_ACTIVITIES,
+} from "@/features/activity/constants"
+import {
+	buildActivitySession,
+	getActivityStartTime,
+} from "@/features/activity/identity/session"
 import { parseActiveSessions } from "@/features/activity/schemas/session"
 import {
 	enqueueSessionFinish,
@@ -18,13 +25,12 @@ import type {
 	CurrentActivity,
 	OpenSessionRow,
 } from "@/features/activity/types"
-import {
-	buildActivitySession,
-	getActiveSessionsKey,
-	getActivityStartTime,
-} from "@/features/activity/utils/activity"
 
 const ACTIVE_SESSION_TTL_SECONDS = 7 * 24 * 60 * 60 // 7 days
+
+export function getActiveSessionsKey(userId: string): string {
+	return `${ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX}${userId}`
+}
 
 function isTrackedActivity(activity: Activity): boolean {
 	return TRACK_CUSTOM_ACTIVITIES || activity.type !== ActivityType.Custom

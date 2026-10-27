@@ -15,6 +15,7 @@ import {
 import {
 	finishActivitySession,
 	getActiveSessions,
+	getActiveSessionsKey,
 	setActiveSessions,
 	startActivitySession,
 } from "@/features/activity/services/sessions"
@@ -30,7 +31,6 @@ import { acquireLockWithRetry } from "@/features/activity/tracking/lock-retry"
 import { createPresenceLookup } from "@/features/activity/tracking/presence-lookup"
 import { reconcileSessions } from "@/features/activity/tracking/reconcile"
 import type { ActiveActivitySessions } from "@/features/activity/types"
-import { getActiveSessionsKey } from "@/features/activity/utils/activity"
 import { resolveUser } from "@/features/system"
 
 const USER_ACTIVITY_LOCK_TTL_SECONDS = 30

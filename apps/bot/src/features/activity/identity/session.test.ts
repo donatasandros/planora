@@ -2,10 +2,8 @@ import { type Activity, ActivityType } from "discord.js"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import {
 	buildActivitySession,
-	getActiveSessionsKey,
 	getActivityStartTime,
-	isCustomActivity,
-} from "@/features/activity/utils/activity"
+} from "@/features/activity/identity/session"
 
 const FIXED_NOW_MS = 1_700_000_000_000
 
@@ -21,23 +19,6 @@ function makeActivity(overrides: Partial<Activity> = {}): Activity {
 
 afterEach(() => {
 	vi.useRealTimers()
-})
-
-describe("getActiveSessionsKey", () => {
-	it("namespaces the key by user", () => {
-		expect(getActiveSessionsKey("42")).toBe("activity:active:42")
-	})
-})
-
-describe("isCustomActivity", () => {
-	it("detects custom activities", () => {
-		expect(
-			isCustomActivity(makeActivity({ type: ActivityType.Custom }))
-		).toBe(true)
-		expect(
-			isCustomActivity(makeActivity({ type: ActivityType.Playing }))
-		).toBe(false)
-	})
 })
 
 describe("getActivityStartTime", () => {

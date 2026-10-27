@@ -2,6 +2,7 @@ import * as redis from "@workspace/redis"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
 	getActiveSessions,
+	getActiveSessionsKey,
 	setActiveSessions,
 } from "@/features/activity/services/sessions"
 
@@ -49,6 +50,12 @@ const session = {
 
 beforeEach(() => {
 	vi.clearAllMocks()
+})
+
+describe("getActiveSessionsKey", () => {
+	it("namespaces the key by user", () => {
+		expect(getActiveSessionsKey("42")).toBe("activity:active:42")
+	})
 })
 
 describe("setActiveSessions", () => {

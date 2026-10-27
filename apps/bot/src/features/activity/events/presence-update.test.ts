@@ -28,6 +28,7 @@ vi.mock("@workspace/redis", () => ({
 vi.mock("@/features/activity/services/sessions", () => ({
 	finishActivitySession: vi.fn(),
 	getActiveSessions: vi.fn(),
+	getActiveSessionsKey: (userId: string) => `activity:active:${userId}`,
 	setActiveSessions: vi.fn(),
 	startActivitySession: vi.fn(),
 }))
