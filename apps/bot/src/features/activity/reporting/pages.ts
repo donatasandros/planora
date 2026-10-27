@@ -4,7 +4,7 @@ import type {
 	CurrentActivity,
 	HistorySession,
 } from "@/features/activity/types"
-import { formatActivityRow } from "@/features/activity/utils/formatting"
+import { formatActivityRow } from "@/features/activity/reporting/formatting"
 import { COLORS } from "@/shared/constants/colors"
 import { ACTIVITY_EMBED_ROWS } from "@/shared/constants/pagination"
 import { splitIntoChunks } from "@/shared/utils/array"

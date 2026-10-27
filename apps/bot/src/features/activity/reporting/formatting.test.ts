@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
 	escapeMarkdown,
 	formatActivityRow,
-} from "@/features/activity/utils/formatting"
+} from "@/features/activity/reporting/formatting"
 
 describe("escapeMarkdown", () => {
 	it("escapes backslashes, backticks, asterisks and underscores", () => {
