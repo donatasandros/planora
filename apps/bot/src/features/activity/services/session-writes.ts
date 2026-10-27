@@ -52,7 +52,7 @@ export function createSessionWriteSink({
 }: SessionWriteSinkOptions): SessionWriteSink {
 	const buffer: PendingOperation[] = []
 	let timer: ReturnType<typeof setInterval> | undefined
-	let flushing = false
+	let flushPromise: Promise<void> | undefined
 
 	function ensureTimer(): void {
 		if (timer) {
@@ -126,29 +126,38 @@ export function createSessionWriteSink({
 	}
 
 	async function flushInternal(): Promise<void> {
-		if (flushing || buffer.length === 0) {
-			return
+		if (flushPromise) {
+			return flushPromise
 		}
 
-		flushing = true
+		if (buffer.length === 0) {
+			return Promise.resolve()
+		}
 
-		try {
-			while (buffer.length > 0) {
-				const batch = buffer.splice(0, SESSION_WRITE_MAX_BATCH_OPS)
+		flushPromise = (async () => {
+			try {
+				while (buffer.length > 0) {
+					const batch = buffer.splice(0, SESSION_WRITE_MAX_BATCH_OPS)
 
-				try {
-					await flushBatch(batch)
-				} catch (err) {
-					logger.error({ err }, "Session write batch failed unexpectedly")
+					try {
+						await flushBatch(batch)
+					} catch (err) {
+						logger.error(
+							{ err },
+							"Session write batch failed unexpectedly"
+						)
 
-					for (const op of batch) {
-						op.reject(err)
+						for (const op of batch) {
+							op.reject(err)
+						}
 					}
 				}
+			} finally {
+				flushPromise = undefined
 			}
-		} finally {
-			flushing = false
-		}
+		})()
+
+		return flushPromise
 	}
 
 	async function stop(): Promise<void> {

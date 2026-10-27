@@ -198,4 +198,34 @@ describe("createSessionWriteSink", () => {
 		expect(clock.clearInterval).toHaveBeenCalledOnce()
 		expect(insertSessionRows).toHaveBeenCalledTimes(2)
 	})
+
+	it("waits for the in-flight flush on stop", async () => {
+		let release!: () => void
+		const gate = new Promise<void>((resolve) => {
+			release = resolve
+		})
+		const insertSessionRows = vi.fn(async (rows: SessionStartRow[]) => {
+			await gate
+			return new Set(rows.map((row) => row.id))
+		})
+		const sink = createSessionWriteSink({
+			insertSessionRows,
+			rollupSessionFinishes: async () => {},
+		})
+
+		const started = sink.enqueueStart(startRow("start-1"))
+		void sink.flush()
+
+		let stopped = false
+		const stopPromise = sink.stop().then(() => {
+			stopped = true
+		})
+
+		await Promise.resolve()
+		expect(stopped).toBe(false)
+
+		release()
+		await stopPromise
+		await expect(started).resolves.toBe(true)
+	})
 })
