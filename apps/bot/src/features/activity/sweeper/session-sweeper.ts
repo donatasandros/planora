@@ -50,7 +50,10 @@ async function readActiveSessions(
 	}
 }
 
-async function sweepStaleSessions(client: Client): Promise<void> {
+async function sweepStaleSessions(
+	client: Client,
+	{ deferUnknown }: { deferUnknown: boolean }
+): Promise<void> {
 	const presenceFor = createPresenceLookup(client)
 
 	const lockToken = await acquireLock(
@@ -115,10 +118,20 @@ async function sweepStaleSessions(client: Client): Promise<void> {
 						trackCustom: TRACK_CUSTOM_ACTIVITIES,
 						now,
 						staleSeconds: STALE_SESSION_SECONDS,
+						deferUnknown,
 					})
 
-					if (plan.refreshed === 0 && plan.finish.length === 0) {
+					if (
+						plan.refreshed === 0 &&
+						plan.finish.length === 0 &&
+						Object.keys(plan.deferred).length === 0
+					) {
 						continue
+					}
+
+					const nextSessions: ActiveActivitySessions = {
+						...plan.keep,
+						...plan.deferred,
 					}
 
 					for (const item of plan.finish) {
@@ -134,8 +147,8 @@ async function sweepStaleSessions(client: Client): Promise<void> {
 						)
 					}
 
-					if (Object.keys(plan.keep).length > 0) {
-						await setActiveSessions(userId, plan.keep)
+					if (Object.keys(nextSessions).length > 0) {
+						await setActiveSessions(userId, nextSessions)
 					} else {
 						await deleteKeyStrict(key)
 					}
@@ -181,7 +194,7 @@ export function startSessionSweeperWorker(client: Client): SessionSweeper {
 			return
 		}
 
-		inFlight = sweepStaleSessions(client)
+		inFlight = sweepStaleSessions(client, { deferUnknown: initial })
 			.catch((err) => {
 				logger.error(
 					{ err },

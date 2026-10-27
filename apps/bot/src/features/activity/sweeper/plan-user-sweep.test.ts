@@ -51,7 +51,12 @@ describe("planUserSweep", () => {
 			staleSeconds: STALE_SECONDS,
 		})
 
-		expect(plan).toEqual({ refreshed: 0, finish: [], keep: sessions })
+		expect(plan).toEqual({
+			refreshed: 0,
+			finish: [],
+			keep: sessions,
+			deferred: {},
+		})
 	})
 
 	it("keeps a stale session whose activity is still present", () => {
@@ -106,6 +111,60 @@ describe("planUserSweep", () => {
 				durationSeconds: 2400,
 			},
 		])
+	})
+
+	it("defers an unknown presence on the boot tick", () => {
+		const target = session()
+
+		const plan = planUserSweep({
+			sessions: asMap(target),
+			activities: undefined,
+			trackCustom: false,
+			now: NOW,
+			staleSeconds: STALE_SECONDS,
+			deferUnknown: true,
+		})
+
+		expect(plan.refreshed).toBe(0)
+		expect(plan.finish).toEqual([])
+		expect(plan.deferred).toEqual(asMap(target))
+		expect(plan.deferred[target.activityKey]?.lastSeenAt).toBe(NOW - 1200)
+	})
+
+	it("still ends an observed absence on the boot tick", () => {
+		const plan = planUserSweep({
+			sessions: asMap(session()),
+			activities: [activity({ name: "Something else" })],
+			trackCustom: false,
+			now: NOW,
+			staleSeconds: STALE_SECONDS,
+			deferUnknown: true,
+		})
+
+		expect(plan.finish).toEqual([
+			{
+				id: "session-1",
+				endedAt: NOW - 1200,
+				durationSeconds: 2400,
+			},
+		])
+		expect(plan.deferred).toEqual({})
+	})
+
+	it("keeps fresh sessions untouched on the boot tick", () => {
+		const fresh = session({ lastSeenAt: NOW - 60 })
+
+		const plan = planUserSweep({
+			sessions: asMap(fresh),
+			activities: undefined,
+			trackCustom: false,
+			now: NOW,
+			staleSeconds: STALE_SECONDS,
+			deferUnknown: true,
+		})
+
+		expect(plan.keep).toEqual(asMap(fresh))
+		expect(plan.deferred).toEqual({})
 	})
 
 	it("ends a custom session when custom activities are not tracked", () => {

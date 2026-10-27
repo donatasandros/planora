@@ -13,6 +13,7 @@ export type UserSweepPlan = {
 	refreshed: number
 	finish: PlannedFinish[]
 	keep: ActiveActivitySessions
+	deferred: ActiveActivitySessions
 }
 
 export function planUserSweep({
@@ -21,12 +22,14 @@ export function planUserSweep({
 	trackCustom,
 	now,
 	staleSeconds,
+	deferUnknown = false,
 }: {
 	sessions: ActiveActivitySessions
 	activities: Activity[] | undefined
 	trackCustom: boolean
 	now: number
 	staleSeconds: number
+	deferUnknown?: boolean
 }): UserSweepPlan {
 	const { stale, active } = partitionStaleSessions(sessions, now, staleSeconds)
 
@@ -35,6 +38,16 @@ export function planUserSweep({
 			refreshed: 0,
 			finish: [],
 			keep: sessions,
+			deferred: {},
+		}
+	}
+
+	if (deferUnknown && activities === undefined) {
+		return {
+			refreshed: 0,
+			finish: [],
+			keep: { ...active },
+			deferred: Object.fromEntries(stale),
 		}
 	}
 
@@ -59,5 +72,6 @@ export function planUserSweep({
 			durationSeconds: Math.max(0, session.lastSeenAt - session.startedAt),
 		})),
 		keep,
+		deferred: {},
 	}
 }
