@@ -80,7 +80,9 @@ export async function resolveUser(userId: string): Promise<UserResolution> {
 
 		await setJson(cacheKey, defaultUser, USER_CACHE_TTL_SECONDS)
 
-		void registerUserEventually(userId)
+		void registerUserEventually(userId).catch((err) => {
+			logger.error({ err, userId }, "Background user registration failed")
+		})
 
 		return { kind: "absent", user: defaultUser }
 	} catch (err) {
