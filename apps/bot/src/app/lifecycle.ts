@@ -44,8 +44,20 @@ export function createLifecycle(client: Client) {
 			try {
 				logger.info({ reason }, "Shutting down bot")
 
-				await sweeper?.stop()
-				await stopSessionBatch()
+				try {
+					await sweeper?.stop()
+				} catch (err) {
+					logger.error({ err }, "Session sweeper shutdown failed")
+				}
+
+				try {
+					await stopSessionBatch()
+				} catch (err) {
+					logger.error(
+						{ err },
+						"Session write flush failed during shutdown"
+					)
+				}
 
 				const results = await Promise.allSettled([
 					client.destroy(),
