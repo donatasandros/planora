@@ -93,6 +93,7 @@ export function createLifecycle(client: Client) {
 	function registerSignalHandlers(): void {
 		process.on("unhandledRejection", (reason) => {
 			logger.error({ reason }, "Unhandled promise rejection")
+			void shutdown("Unhandled promise rejection", 1)
 		})
 
 		process.once("SIGINT", () => {
