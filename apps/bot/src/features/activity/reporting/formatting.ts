@@ -6,25 +6,17 @@ type ActivityRowOptions = {
 	timestamp?: number | null
 }
 
-export function escapeMarkdown(value: string): string {
-	return value
-		.replaceAll("\\", "\\\\")
-		.replaceAll("`", "\\`")
-		.replaceAll("*", "\\*")
-		.replaceAll("_", "\\_")
-}
-
 export function formatActivityRow(
 	activityName: string,
 	options: ActivityRowOptions = {}
 ): string {
-	const name = `\`${escapeMarkdown(activityName)}\``
+	const name = `\`${activityName.replaceAll("`", "'")}\``
 	const time = options.durationSeconds
 		? `- ${formatTime(options.durationSeconds)}`
 		: ""
 	const date = options.timestamp
 		? `- ${discordTimestamp(options.timestamp)}`
-		: "- Unknown"
+		: "- now"
 
-	return `**•** ${name} ${time} ${date}`
+	return ["**•**", name, time, date].filter(Boolean).join(" ")
 }
