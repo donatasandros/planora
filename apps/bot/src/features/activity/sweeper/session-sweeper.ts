@@ -1,7 +1,6 @@
 import {
 	acquireLock,
 	deleteKeyStrict,
-	getJson,
 	releaseLock,
 	scanKeys,
 } from "@workspace/redis"
@@ -33,6 +32,24 @@ const SWEEP_USER_LOCK_TTL_SECONDS = 30
 const STALE_SESSION_SECONDS = 15 * 60 // 15 minutes
 const ACTIVE_SESSION_PATTERN = `${ACTIVITY_REDIS_KEYS.ACTIVE_SESSION_PREFIX}*`
 
+async function readActiveSessions(
+	userId: string
+): Promise<ActiveActivitySessions | null> {
+	try {
+		return await getActiveSessions(userId)
+	} catch (err) {
+		logger.warn(
+			{
+				err,
+				userId,
+			},
+			"Skipped user after failing to read active sessions"
+		)
+
+		return null
+	}
+}
+
 async function sweepStaleSessions(client: Client): Promise<void> {
 	const presenceFor = createPresenceLookup(client)
 
@@ -54,7 +71,7 @@ async function sweepStaleSessions(client: Client): Promise<void> {
 				)
 				const userLockKey = ACTIVITY_REDIS_KEYS.USER_LOCK(userId)
 
-				const snapshot = await getJson<ActiveActivitySessions>(key)
+				const snapshot = await readActiveSessions(userId)
 
 				if (!snapshot) {
 					continue
@@ -86,7 +103,7 @@ async function sweepStaleSessions(client: Client): Promise<void> {
 				}
 
 				try {
-					const sessions = await getJson<ActiveActivitySessions>(key)
+					const sessions = await readActiveSessions(userId)
 
 					if (!sessions) {
 						continue
