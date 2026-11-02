@@ -1,0 +1,9 @@
+{
+  "name": "@planora/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p ." },
+  "dependencies": { "effect": "4.1.2" }
+}

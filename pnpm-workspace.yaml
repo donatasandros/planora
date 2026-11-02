@@ -1,0 +1,9 @@
+packages:
+   - "apps/*"
+   - "packages/*"
+
+allowBuilds:
+   esbuild: true
+
+minimumReleaseAgeExclude:
+   - effect@4.1.2
