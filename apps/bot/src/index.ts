@@ -24,11 +24,10 @@ const program = Effect.gen(function* () {
 const DiscordLayer = DiscordConfig.layerConfig({
   token: Config.Redacted("DISCORD_BOT_TOKEN"),
   gateway: {
-    intents:
-    Config.succeed(
-          Discord.GatewayIntentBits.Guilds |
-            Discord.GatewayIntentBits.GuildPresences,
-        ),
+    intents: Config.succeed(
+      Discord.GatewayIntentBits.Guilds |
+        Discord.GatewayIntentBits.GuildPresences,
+    ),
   },
 })
 

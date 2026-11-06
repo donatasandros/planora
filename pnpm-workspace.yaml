@@ -1,9 +1,9 @@
 packages:
-   - "apps/*"
-   - "packages/*"
+  - "apps/*"
+  - "packages/*"
 
 allowBuilds:
-   esbuild: true
+  esbuild: true
 
 minimumReleaseAgeExclude:
-   - effect@4.1.2
+  - effect@4.1.2

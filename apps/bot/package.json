@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --env-file=.env --import tsx src/index.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "effect-tsgo tsc --noEmit -p ."
   },
   "dependencies": {
     "@effect/platform-node": "4.1.2",
