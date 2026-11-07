@@ -1,3 +1,1 @@
-const hello = "world"
-
-export { hello }
+export * from "./presence"
