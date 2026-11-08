@@ -1,7 +1,8 @@
 import { NodeHttpClient, NodeRuntime, NodeSocket } from "@effect/platform-node"
-import { Config, Effect, Layer, Stream } from "effect"
+import { Config, Effect, Layer, Schema, Stream } from "effect"
 import { Discord, DiscordConfig } from "dfx"
 import { DiscordGateway, DiscordLive } from "dfx/gateway"
+import { normalizePresenceUpdate, PresencePayloadSchema } from "@planora/core"
 
 const program = Effect.gen(function* () {
   const gateway = yield* DiscordGateway
@@ -9,15 +10,16 @@ const program = Effect.gen(function* () {
   yield* Effect.log("gateway connected, waiting for presence")
 
   yield* gateway.fromDispatch("PRESENCE_UPDATE").pipe(
-    Stream.runForEach((p) =>
-      Effect.log("presence", {
-        userId: p.user.id,
-        username: p.user.username,
-        status: p.status,
-        guild: p.guild_id,
-        playing: p.activities?.map((a) => a.name),
-      }),
+    Stream.mapEffect((payload) =>
+      Schema.decodeUnknownEffect(PresencePayloadSchema)(payload).pipe(
+        Effect.map(normalizePresenceUpdate),
+        Effect.tap((event) => Effect.log("presence", event)),
+        Effect.catchTag("SchemaError", (error) =>
+          Effect.logWarning("invalid presence payload", error),
+        ),
+      ),
     ),
+    Stream.runDrain,
   )
 })
 
