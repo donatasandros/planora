@@ -36,7 +36,7 @@ describe("normalizePresenceUpdate", () => {
     })
 
     expect(presence).toEqual({
-      discordUserId: "1",
+      userId: "1",
       guildId: "2",
       status: "online",
       activities: [{ type: 0, name: "Minecraft", applicationId: "3" }],

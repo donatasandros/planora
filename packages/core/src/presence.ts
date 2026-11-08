@@ -1,5 +1,8 @@
 import { Schema } from "effect"
 
+export const DiscordUserId = Schema.String.pipe(Schema.brand("DiscordUserId"))
+export type DiscordUserId = Schema.Schema.Type<typeof DiscordUserId>
+
 const PresenceActivitySchema = Schema.Struct({
   type: Schema.Int,
   name: Schema.String,
@@ -8,7 +11,7 @@ const PresenceActivitySchema = Schema.Struct({
 
 export const PresencePayloadSchema = Schema.Struct({
   user: Schema.Struct({
-    id: Schema.String,
+    id: DiscordUserId,
   }),
   guild_id: Schema.optional(Schema.String),
   status: Schema.String,
@@ -26,7 +29,7 @@ export interface NormalizedActivity {
 }
 
 export interface NormalizedPresence {
-  readonly discordUserId: string
+  readonly userId: DiscordUserId
   readonly guildId: string | null
   readonly status: string
   readonly activities: ReadonlyArray<NormalizedActivity>
@@ -36,7 +39,7 @@ export function normalizePresenceUpdate(
   payload: PresencePayload,
 ): NormalizedPresence {
   return {
-    discordUserId: payload.user.id,
+    userId: payload.user.id,
     guildId: payload.guild_id ?? null,
     status: payload.status,
     activities: (payload.activities ?? [])
