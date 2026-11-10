@@ -217,6 +217,22 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(@types/node@26.6.6)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(tsx@4.23.15))
 
+  packages/db:
+    dependencies:
+      '@effect/sql-pg':
+        specifier: 4.1.2
+        version: 4.1.2(effect@4.1.2)
+      '@planora/core':
+        specifier: workspace:*
+        version: link:../core
+      effect:
+        specifier: 4.1.2
+        version: 4.1.2
+    devDependencies:
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+
 packages:
 
   '@effect/platform-node-shared@4.1.2':
@@ -231,6 +247,11 @@ packages:
     peerDependencies:
       effect: ^4.1.2
       redis: '>=5.1.0 <7.0.0'
+
+  '@effect/sql-pg@4.1.2':
+    resolution: {integrity: sha512-0UehR7B5W8dC+dX6fDeWStLbVbBb2M4pk4HBATEeH0cmV4Odl2lckTg0jFmLuadekTLa4OyB+bZQo1yTG1y2Mw==}
+    peerDependencies:
+      effect: ^4.1.2
 
   '@effect/tsgo-darwin-arm64@0.67.3':
     resolution: {integrity: sha512-9GnBnz1vuqRQ8fvxwNEYlnLqYXzASbABGzk1H9YXMnC34TlRmVTKquQ1muPOiIGskb2XhmoqBQBN7GiQWNqxEg==}
@@ -1250,6 +1271,10 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@effect/sql-pg@4.1.2(effect@4.1.2)':
+    dependencies:
+      effect: 4.1.2
 
   '@effect/tsgo-darwin-arm64@0.67.3':
     optional: true
