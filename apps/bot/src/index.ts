@@ -3,6 +3,7 @@ import { Config, Effect, Layer, Schema, Stream } from "effect"
 import { Discord, DiscordConfig } from "dfx"
 import { DiscordGateway, DiscordLive } from "dfx/gateway"
 import { normalizePresenceUpdate, PresencePayloadSchema } from "@planora/core"
+import { DatabaseLive, storePresenceEvent } from "@planora/db"
 
 const program = Effect.gen(function* () {
   const gateway = yield* DiscordGateway
@@ -13,7 +14,7 @@ const program = Effect.gen(function* () {
     Stream.mapEffect((payload) =>
       Schema.decodeUnknownEffect(PresencePayloadSchema)(payload).pipe(
         Effect.map(normalizePresenceUpdate),
-        Effect.tap((event) => Effect.log("presence", event)),
+        Effect.tap(storePresenceEvent),
         Effect.catchTag("SchemaError", (error) =>
           Effect.logWarning("invalid presence payload", error),
         ),
@@ -38,6 +39,7 @@ const AppLive = Layer.effectDiscard(program).pipe(
   Layer.provide(DiscordLayer),
   Layer.provide(NodeHttpClient.layerUndici),
   Layer.provide(NodeSocket.layerWebSocketConstructor),
+  Layer.provide(DatabaseLive),
 )
 
 NodeRuntime.runMain(Layer.launch(AppLive))
