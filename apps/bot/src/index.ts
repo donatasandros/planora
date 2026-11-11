@@ -14,7 +14,13 @@ const program = Effect.gen(function* () {
     Stream.mapEffect((payload) =>
       Schema.decodeUnknownEffect(PresencePayloadSchema)(payload).pipe(
         Effect.map(normalizePresenceUpdate),
-        Effect.tap(storePresenceEvent),
+        Effect.flatMap((presence) =>
+          storePresenceEvent(presence).pipe(
+            Effect.catchTag("SqlError", (error) =>
+              Effect.logWarning("failed to store presence event", error),
+            ),
+          ),
+        ),
         Effect.catchTag("SchemaError", (error) =>
           Effect.logWarning("invalid presence payload", error),
         ),
